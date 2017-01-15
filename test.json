@@ -1,0 +1,40 @@
+{
+    "kendalltau_avg_frq": -0.59999999999999998, 
+    "rank": [
+        {
+            "dish": "grey-goose_mon-ami-gabi", 
+            "dish_cnt": 6, 
+            "rank_by_frq": 1, 
+            "rank_by_avg": 4, 
+            "avg_cos": 0.012922067691632372
+        }, 
+        {
+            "dish": "organic-vanilla-yogurt-parfait_mon-ami-gabi", 
+            "dish_cnt": 6, 
+            "rank_by_frq": 2, 
+            "rank_by_avg": 5, 
+            "avg_cos": 0.009415211992394687
+        }, 
+        {
+            "dish": "tomato-juice_mon-ami-gabi", 
+            "dish_cnt": 5, 
+            "rank_by_frq": 3, 
+            "rank_by_avg": 2, 
+            "avg_cos": 0.024532446527350243
+        }, 
+        {
+            "dish": "gabis-house-blend_mon-ami-gabi", 
+            "dish_cnt": 5, 
+            "rank_by_frq": 4, 
+            "rank_by_avg": 3, 
+            "avg_cos": 0.020795624052683009
+        }, 
+        {
+            "dish": "alcoholiemergen-c-drink_mon-ami-gabi", 
+            "dish_cnt": 0, 
+            "rank_by_frq": 5, 
+            "rank_by_avg": 1, 
+            "avg_cos": 0.035528361288296943
+        }
+    ]
+}
