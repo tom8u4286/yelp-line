@@ -440,6 +440,7 @@ if __name__ == '__main__':
     build_type = 3
     main(parse_args())
     build_type = 4
+    main(parse_args())
 
 
 
