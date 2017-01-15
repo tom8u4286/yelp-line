@@ -167,73 +167,38 @@ def build_cooccur(vocab, corpus, window_size=4, min_count=None):
 
                 # Weight by inverse of distance between words
                 #increment = 1.0 / float(distance)
-                increment = 1.0
+                if build_type == 1:
+                    increment = 1.0 / float(distance)
+                else:
+                    increment = 1.0
+
 
                 # Build co-occurrence matrix symmetrically (pretend we
                 # are calculating right contexts as well)
-
-                #if "_senti" in words[center_i]:
                 cooccurrences[center_id, left_id] += increment
                 cooccurrences[left_id, center_id] += increment
-                #else:
-                #    cooccurrences[center_id, left_id] = 1.0
-                #    cooccurrences[left_id, center_id] = 1.0
-               # tmp = 0
-               # if "_senti" in words[center_i] and rest_name in words[left_i]:
-               #     tmp = 1
-               #     cooccurrences[center_id, left_id] += increment
-               #     cooccurrences[left_id, center_id] += increment
-               # elif rest_name in words[center_i] and "_senti" in words[left_i]:
-               #     tmp = 2
-               #     cooccurrences[center_id, left_id] += increment
-               #     cooccurrences[left_id, center_id] += increment
-               # else:
-               #     tmp = 3
-               #     cooccurrences[center_id, left_id] = 1.0
-               #     cooccurrences[left_id, center_id] = 1.0
-               # if "prepar_senti" in words[center_i] and "rare_senti" in words[left_i]:
-               #     print "excel center, second left"
-               #     print tmp
-               #     cooccurrences[center_id, left_id] = 123
-               #     cooccurrences[left_id, center_id] = 123
-               #     #import time
-               #     #time.sleep(7)
-               # if "rare_senti" in words[center_i] and "prepar_senti" in words[left_i]:
-               #     print "second center, excel_senti left"
-               #     print tmp
-               #     cooccurrences[center_id, left_id] = 123
-               #     cooccurrences[left_id, center_id] = 123
-               #     #import time
-               #     #time.sleep(7)
-               #     #sys.exit()
 
     # Now yield our tuple sequence (dig into the LiL-matrix internals to
     # quickly iterate through all nonzero cells)
     for i, (row, data) in enumerate(itertools.izip(cooccurrences.rows,
                                                    cooccurrences.data)):
-        #print "i, row, data: ", i, row, data
-        #print id2word[i]
-        #print len(cooccurrences.data)
-        #sys.exit("stop")
         if min_count is not None and vocab[id2word[i]][1] < min_count:
             continue
 
         for data_idx, j in enumerate(row):
             if min_count is not None and vocab[id2word[j]][1] < min_count:
-                #print "id2word[j]: ", id2word[j]
-                #print "id2word[j][1]: ", vocab[id2word[j]]
-                #print "vocab[id2word[j][1]]: ", vocab[id2word[j]][1]
                 continue
-            #print "data_idx: ",data_idx
-            #print "data[data_idx]: ",data[data_idx]
-            #print "i: ",i
-            #print "j: ",j
-            #sys.exit("stop")
-            if "_mon-ami-gabi" in id2word[i] and "_senti" in id2word[j]:
+
+            if build_type == 1 or build_type == 2:
                 pass
-            elif "_mon-ami-gabi" in id2word[j] and "_senti" in id2word[i]:
-                pass
-            else:
+            elif build_type == 3:
+                if rest_name in id2word[i] and "_senti" in id2word[j]:
+                    pass
+                elif rest_name in id2word[j] and "_senti" in id2word[i]:
+                    pass
+                else:
+                    data[data_idx] = 1.0
+            elif build_type == 4:
                 data[data_idx] = 1.0
 
             yield i, j, data[data_idx]
@@ -445,7 +410,7 @@ def main(arguments):
                                  window_size=arguments.window_size,
                                  min_count=arguments.min_count)
 
-    with open('data/cooccurrence/restaurant_%s_cooccur.txt'%m.group(0), 'w') as fp:
+    with open('data/cooccurrence/restaurant_%s_cooccur_type%s.txt'%(m.group(0),build_type), 'w') as fp:
         fp.write('\n'.join('%s %s %s' % (inv_vocab[x[0]], inv_vocab[x[1]], x[2]) for x in cooccurrences))
     #logger.info("Cooccurrence list fetch complete (%i pairs).\n",
     #             len(cooccurrences))
@@ -468,4 +433,14 @@ def main(arguments):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG,
                         format="%(asctime)s\t%(message)s")
+    build_type = 1
     main(parse_args())
+    build_type = 2
+    main(parse_args())
+    build_type = 3
+    main(parse_args())
+    build_type = 4
+
+
+
+

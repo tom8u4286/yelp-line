@@ -362,7 +362,7 @@ class ReviewParser:
         for dish in dishes_ar:
             cnt += 1
             for review in self.backend_reviews:
-                print dish
+                #print dish
                 count += review.count(dish)
                 if dish == u"alcoholiemergen-c-drink_mon-ami-gabi":
                     print count
