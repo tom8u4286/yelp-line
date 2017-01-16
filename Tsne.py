@@ -44,8 +44,8 @@ class Tsne:
 
     def render(self):
         filename = sys.argv[1].split("/")
-        num = re.search("[0-9]+", filename[3])
-        f = open("data/vectors/2dim/restaurant_%s_vector2.json"%num.group(0), "w+")
+        num = re.search("([0-9]+).+(type[0-9])", filename[3])
+        f = open("data/vectors/2dim/restaurant_%s_vector2_%s.json"%(num.group(1),num.group(2)), "w+")
         json.dump(self.dim2, f, indent = 4)
         f.close()
 
