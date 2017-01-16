@@ -13,6 +13,7 @@ class DishScore:
         """sys.argv[0] data/vectors/200dim/restaurant_1_vector200.txt"""
         self.vec64_src = sys.argv[1]
         self.rest_num = int(re.search("_([0-9]+)_", sys.argv[1].split("/")[3]).group(1))
+        self.build_type = int(re.search("type([0-9]+)", sys.argv[1].split("/")[3]).group(1))
         self.rest_dic_src ="data/restaurant_dict_list/restaurant_dict_list.json"
         self.rest_dic_list_src = "data/restaurant_dict_list/restaurant_dict_%s.json"%self.rest_num
         self.rest_dic = {}
@@ -42,7 +43,7 @@ class DishScore:
         senti_indices = []
         dish_indices = []
         rest_name = self.get_rest_name().lower().replace(" ","-")
-        print "rest name:",rest_name
+        #print "rest name:",rest_name
         for idx, word in enumerate(words):
             if "_senti" in word:
                 senti_indices.append(idx)
@@ -111,7 +112,7 @@ class DishScore:
         #print cnt_rank
         #print avg_rank
         tau, p_value = stats.kendalltau(cnt_rank, avg_rank)
-        f_test = open("test.json","w+")
+        #f_test = open("test.json","w+")
         dic = {}
         dic["kendalltau_avg_frq"] = tau
         ordered_dict_list = []
@@ -125,7 +126,7 @@ class DishScore:
             ordered_dict_list.append(ordered_dict)
         dic["rank"] = ordered_dict_list
 
-        f_test.write(json.dumps(dic, indent=4))
+        #f_test.write(json.dumps(dic, indent=4))
         #sys.exit("stop")
 
         # 1/2 added by Tom. frequency rank of dishes.
@@ -155,9 +156,11 @@ class DishScore:
         return dic
 
     def render(self, dish_list):
-        f = open("data/rank/restaurant_%s_rank.json"%self.rest_num,"w+")
+
+        f = open("data/rank/restaurant_%s_rank_type%s.json"%(self.rest_num, self.build_type),"w+")
         f.write(json.dumps(dish_list ,indent = 4))
         f.close()
+        print "DishScore.py rest_%s_type%s completed"%(self.rest_num, self.build_type)
 
 
 class NoIndent(object):
