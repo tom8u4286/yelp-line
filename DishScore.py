@@ -159,19 +159,19 @@ class DishScore:
             ordered_dict["dish"] = item["dish"]
             ordered_dict["dish_cnt"] = item["dish_cnt"]
             ordered_dict["rank_by_frq"] = item["rank_by_cnt"]
-            ordered_dict["rank_by_sum_higher_cos"] = "0.0:%s, 0.2:%s, 0.4:%s, 0.6:%s, 0.8:%s"%(item["rank_by_sum_higher0_cos"],item["rank_by_sum_higher02_cos"],item["rank_by_sum_higher04_cos"],item["rank_by_sum_higher06_cos"],item["rank_by_sum_higher08_cos"])
+            ordered_dict["rank_by_sum_higher_cos"] = NoIndent({0:item["rank_by_sum_higher0_cos"],0.2:item["rank_by_sum_higher02_cos"],0.4:item["rank_by_sum_higher04_cos"],0.6:item["rank_by_sum_higher06_cos"],0.8:item["rank_by_sum_higher08_cos"]})
             ordered_dict["rank_by_avg"] = item["rank_by_avg"]
             ordered_dict["rank_by_max"] = item["rank_by_max"]
             ordered_dict["avg_cos"] = item["avg_cos"]
             ordered_dict["max_cos_10"] = NoIndent(item["max_cos_10"])
             ordered_dict["max_words"] = NoIndent(item["max_words"])
             ordered_dict_list.append(ordered_dict)
-        dic["precision_avg"] = {"at10":p_at10_avg, "at20":p_at20_avg, "at30":p_at30_avg}
-        dic["precision_higher0"] = {"at10":p_at10_0, "at20":p_at20_0, "at30":p_at30_0 }
-        dic["precision_higher02"] = {"at10":p_at10_02, "at20":p_at20_02, "at30":p_at30_02 }
-        dic["precision_higher04"] = {"at10":p_at10_04, "at20":p_at20_04, "at30":p_at30_04 }
-        dic["precision_higher06"] = {"at10":p_at10_06, "at20":p_at20_06, "at30":p_at30_06 }
-        dic["precision_higher08"] = {"at10":p_at10_08, "at20":p_at20_08, "at30":p_at30_08 }
+        dic["precision_avg"] = NoIndent({"at10":p_at10_avg, "at20":p_at20_avg, "at30":p_at30_avg})
+        dic["precision_higher0"] =  NoIndent({"at10":p_at10_0, "at20":p_at20_0, "at30":p_at30_0 })
+        dic["precision_higher02"] =  NoIndent({"at10":p_at10_02, "at20":p_at20_02, "at30":p_at30_02 })
+        dic["precision_higher04"] =  NoIndent({"at10":p_at10_04, "at20":p_at20_04, "at30":p_at30_04 })
+        dic["precision_higher06"] =  NoIndent({"at10":p_at10_06, "at20":p_at20_06, "at30":p_at30_06 })
+        dic["precision_higher08"] =  NoIndent({"at10":p_at10_08, "at20":p_at20_08, "at30":p_at30_08 })
         dic["rank"] = ordered_dict_list
         return dic
 
