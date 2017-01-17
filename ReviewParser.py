@@ -364,9 +364,6 @@ class ReviewParser:
             for review in self.backend_reviews:
                 #print dish
                 count += review.count(dish)
-                if dish == u"alcoholiemergen-c-drink_mon-ami-gabi":
-                    print count
-                    sys.exit("stop")
             count_list.append(count)
             count = 0
 
@@ -530,7 +527,7 @@ class ReviewParser:
     def render_compare_file(self):
         """ (5) render compare json file."""
         """12/23 Tom added."""
-        compare_file = open("data/backend_reviews/restaurant_%s_comapre.json"%(self.filename),"w+")
+        compare_file = open("data/backend_reviews/restaurant_%s_compare.json"%(self.filename),"w+")
         lst = []
         for idx, review in enumerate(self.clean_reviews):
             orderedDict3 = OrderedDict()
