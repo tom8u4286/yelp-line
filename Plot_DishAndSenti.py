@@ -7,9 +7,10 @@ class Plot_DishAndSenti:
 
     def __init__(self):
         """src == '../data/line-data/vectors/2dim/restaurant_1_vector2.json'"""
-        self.src = sys.argv[1]
-        self.rest_num = int(re.search("_([0-9]+)_",sys.argv[1].split("/")[5]).group(1))
-        print self.rest_num
+        self.rest_num = sys.argv[1]
+        self.build_type = sys.argv[2]
+        self.src = "data/vectors/2dim/restaurant_%s_type%s.txt"%(self.rest_num, self.build_type)
+        #self.rest_num = int(re.search("_([0-9]+)_",sys.argv[1].split("/")[5]).group(1))
 
     def render(self):
         dic = json.load(open(self.src))
@@ -29,8 +30,9 @@ class Plot_DishAndSenti:
                 print word
                 ax.plot( vec[0], vec[1], "yo")
                 plot.text( vec[0]+0.01, vec[1]+0.01, word)
-        ax.set_title("dish and Senti")
-        plt.savefig("Dish_and_Senti.png")
+        ax.set_title("rest%s, type%s"%(self.rest_num,self.build_type))
+        plt.savefig("data/plot/restaurant_%s_type%s.png"%(self.rest_num, self.build_type))
+        self.rest_num = sys.argv[1]
 
 
 

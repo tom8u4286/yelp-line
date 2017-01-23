@@ -29,7 +29,7 @@ class ReviewParser:
 
         self.senti_matched_cnt = 0
 
-        self.switch = 1
+        self.switch = 0
 
     def get_review_dict(self):
         with open(self.src) as f:
@@ -316,6 +316,7 @@ class ReviewParser:
         dishes_regex = self.get_dishes_regex()
         dishes_ar = self.get_dishes_ar()
 
+
         if self.switch:
             print "\n" + "-"*70
             print "Processing backend_reviews"
@@ -326,12 +327,20 @@ class ReviewParser:
             for j in xrange(len(dishes_regex)):
                 backend_reviews[i] = backend_reviews[i].lower()
                 """ Replacement | E.g. I love country pate. -> I love housemade-country-pate_mon-ami-gabi. """
-                backend_reviews[i] = re.sub(dishes_regex[j], dishes_ar[j], backend_reviews[i], flags = re.IGNORECASE)
+                backend_reviews[i] = re.sub(dishes_regex[j], " "+dishes_ar[j], backend_reviews[i], flags = re.IGNORECASE)
+                if "alcoholiemergen-c-drink_mon-ami-gabi" in backend_reviews[i]:
+                    print backend_reviews[i]
+                    print dishes_regex[j],dishes_ar[j]
+                    sys.exit("stop")
                 backend_reviews[i] = re.sub("(\s)+", r" ", backend_reviews[i])
 
                 if self.switch:
                     sys.stdout.write("\rStatus: %s / %s | %s / %s    "%(i+1, length1, j+1, length2))
                     sys.stdout.flush()
+
+        #f = open("test.json","w+")
+        #f.write(json.dumps(backend_reviews, indent=4, cls=NoIndentEncoder))
+        #sys.exit("stop")
 
         backend_reviews = self.stem(backend_reviews)
         print "\nlength of self.backend_reviews stemmed: ", len(backend_reviews)
@@ -370,6 +379,7 @@ class ReviewParser:
             if self.switch:
                 sys.stdout.write("\rStatus: %s / %s"%(cnt, length))
                 sys.stdout.flush()
+
 
         """counting the avg_word per review."""
         review_avg_words = sum([len(review.split(" ")) for review in self.backend_reviews])/len(self.backend_reviews)
@@ -434,6 +444,7 @@ class ReviewParser:
             if self.switch:
                 sys.stdout.write("\rStatus: %s / %s"%(index_cnt, length))
                 sys.stdout.flush()
+
 
         return statistics
 

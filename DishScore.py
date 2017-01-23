@@ -159,7 +159,13 @@ class DishScore:
             ordered_dict["dish"] = item["dish"]
             ordered_dict["dish_cnt"] = item["dish_cnt"]
             ordered_dict["rank_by_frq"] = item["rank_by_cnt"]
-            ordered_dict["rank_by_sum_higher_cos"] = NoIndent({0:item["rank_by_sum_higher0_cos"],0.2:item["rank_by_sum_higher02_cos"],0.4:item["rank_by_sum_higher04_cos"],0.6:item["rank_by_sum_higher06_cos"],0.8:item["rank_by_sum_higher08_cos"]})
+            o_dict = OrderedDict()
+            o_dict[0] = item["rank_by_sum_higher0_cos"]
+            o_dict[0.2] = item["rank_by_sum_higher02_cos"]
+            o_dict[0.4] = item["rank_by_sum_higher04_cos"]
+            o_dict[0.6] = item["rank_by_sum_higher06_cos"]
+            o_dict[0.8] = item["rank_by_sum_higher08_cos"]
+            ordered_dict["rank_by_sum_higher_cos"] = NoIndent(o_dict)
             ordered_dict["rank_by_avg"] = item["rank_by_avg"]
             ordered_dict["rank_by_max"] = item["rank_by_max"]
             ordered_dict["avg_cos"] = item["avg_cos"]
