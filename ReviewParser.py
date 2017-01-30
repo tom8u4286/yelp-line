@@ -29,7 +29,7 @@ class ReviewParser:
 
         self.senti_matched_cnt = 0
 
-        self.switch = 0
+        self.switch = 1
 
     def get_review_dict(self):
         with open(self.src) as f:
@@ -175,10 +175,11 @@ class ReviewParser:
             text = ''.join(''.join(s)[:2] for _, s in itertools.groupby(text)) # sooo happppppy -> so happy
             clean_reviews.append(text)
 
-            sys.stdout.write("\rStatus: %s / %s"%(cnt, length))
-            sys.stdout.flush()
-
-        print "clean_reviews complete...length of clean ", len(clean_reviews)
+            if self.switch:
+                sys.stdout.write("\rStatus: %s / %s"%(cnt, length))
+                sys.stdout.flush()
+        if self.switch:
+            print "\nclean_reviews complete...length of clean ", len(clean_reviews)
         return clean_reviews
 
     def get_frontend_review_dict_list(self):
@@ -231,7 +232,8 @@ class ReviewParser:
 
     def add_senti(self,backend_reviews):
         """2016/12/17 Tom added the function.(the sentiment would be stemmed.)"""
-        print "\nAdding _senti after stemmed sentiment words.... "
+        if self.switch:
+            print "\nAdding _senti after stemmed sentiment words.... "
         stemmer = SnowballStemmer('english')
         pos_list = self.get_lexicon()
         words_length = len(pos_list)
@@ -240,6 +242,7 @@ class ReviewParser:
         matched_cnt = 0
         review_cnt = 0
         new_reviews_list = []
+
         for review in review_list:
             review_cnt += 1
             new_review = " "+review+" "
@@ -259,10 +262,13 @@ class ReviewParser:
                 if word+" " in review:
                     new_review = new_review.replace(" "+word+" ", " "+word_senti+" ",5)
                     matched_cnt += 1
-                sys.stdout.write("\rtotally matched: %s, reviews: %s / %s, senti_words: %s / %s  "%(matched_cnt, review_cnt, review_list_length, word_cnt, words_length))
-                sys.stdout.flush()
+
+                if self.switch:
+                    sys.stdout.write("\rtotally matched: %s, reviews: %s / %s, senti_words: %s / %s  "%(matched_cnt, review_cnt, review_list_length, word_cnt, words_length))
+                    sys.stdout.flush()
             new_reviews_list.append(new_review.strip())
         self.senti_matched_cnt = matched_cnt
+
         return new_reviews_list
 
     def stem(self, backend_reviews):
@@ -270,7 +276,8 @@ class ReviewParser:
         #stop_words = set(stopwords.words('english'))
         stemmer = SnowballStemmer('english')
         length = len(backend_reviews)
-        print "\nStemming backend reviews...."
+        if self.switch:
+            print "\nStemming backend reviews...."
         new_reviews_list = []
         review_cnt = 0
         for review in backend_reviews:
@@ -283,8 +290,9 @@ class ReviewParser:
             """join back the review from a list to a string"""
             new_review = " ".join(filtered_sentence)
             new_reviews_list.append(new_review)
-            sys.stdout.write("\rreviews: %s / %s"%(review_cnt, length))
-            sys.stdout.flush()
+            if self.switch:
+                sys.stdout.write("\rreviews: %s / %s"%(review_cnt, length))
+                sys.stdout.flush()
 
         return new_reviews_list
 
@@ -292,7 +300,8 @@ class ReviewParser:
         """2016/12/22 Tom added the function."""
         stop_words = set(stopwords.words('english'))
         length = len(backend_reviews)
-        print "\nRemoving stopwords..."
+        if self.switch:
+            print "\nRemoving stopwords..."
         new_reviews_list = []
         review_cnt = 0
         for review in backend_reviews:
@@ -303,8 +312,9 @@ class ReviewParser:
             """join back the review from a list to a string"""
             new_review = " ".join(filtered_sentence)
             new_reviews_list.append(new_review)
-            sys.stdout.write("\rreviews: %s / %s    "%(review_cnt, length))
-            sys.stdout.flush()
+            if self.switch:
+                sys.stdout.write("\rreviews: %s / %s    "%(review_cnt, length))
+                sys.stdout.flush()
 
         return new_reviews_list
 
@@ -319,7 +329,7 @@ class ReviewParser:
 
         if self.switch:
             print "\n" + "-"*70
-            print "Processing backend_reviews"
+            print "Processing backend_reviews, change the dish into dish_ar.."
 
         length1 = len(backend_reviews)
         for i in xrange(len(backend_reviews)):
@@ -328,10 +338,6 @@ class ReviewParser:
                 backend_reviews[i] = backend_reviews[i].lower()
                 """ Replacement | E.g. I love country pate. -> I love housemade-country-pate_mon-ami-gabi. """
                 backend_reviews[i] = re.sub(dishes_regex[j], " "+dishes_ar[j], backend_reviews[i], flags = re.IGNORECASE)
-                if "alcoholiemergen-c-drink_mon-ami-gabi" in backend_reviews[i]:
-                    print backend_reviews[i]
-                    print dishes_regex[j],dishes_ar[j]
-                    sys.exit("stop")
                 backend_reviews[i] = re.sub("(\s)+", r" ", backend_reviews[i])
 
                 if self.switch:
@@ -343,13 +349,20 @@ class ReviewParser:
         #sys.exit("stop")
 
         backend_reviews = self.stem(backend_reviews)
-        print "\nlength of self.backend_reviews stemmed: ", len(backend_reviews)
-        backend_reviews = self.add_senti(backend_reviews)
-        print "\nlength of backend_reviews add_senti: ", len(backend_reviews)
-        backend_reviews = self.remove_stopwords(backend_reviews)
-        print "\nlength of backend_reviews remove_stopwords: ",len(backend_reviews)
+        if self.switch:
+            print "\nlength of self.backend_reviews stemmed: ", len(backend_reviews)
 
-        print "get_backend_reviews complete... the length of backend_review:", len(backend_reviews)
+        backend_reviews = self.add_senti(backend_reviews)
+
+        if self.switch:
+            print "\nlength of backend_reviews add_senti: ", len(backend_reviews)
+        backend_reviews = self.remove_stopwords(backend_reviews)
+
+        if self.switch:
+            print "\nlength of backend_reviews remove_stopwords: ",len(backend_reviews)
+
+        if self.switch:
+            print "get_backend_reviews complete... the length of backend_review:", len(backend_reviews)
         return backend_reviews
 
     def get_restaurant_dict(self):
@@ -550,24 +563,36 @@ class ReviewParser:
 
     def count_senti_lenght(self):
         """12/29 Tom added."""
+        print "\nCalculating the avg length of senti and dishes..."
 
+        stemmer = SnowballStemmer('english')
         length_list = []
         err_cnt = 0
         tmp_list = []
+        processing_cnt = 1
+        total_length = len(self.backend_reviews)
+        #sys.exit("stop")
         for review in self.backend_reviews:
-
             if "_senti" in review:
+                print "test1"
                 review = review.split(" ")
                 dish_idx = []
-                restaurant_name = self.restaurant_name.lower().replace(" ","-")
+                print "before stemmed: ",self.restaurant_name
+                restaurant_name = stemmer.stem(self.restaurant_name.lower().replace(" ","-").replace("&", "and").replace("\'", "").replace(".", "").replace(",","")).decode('unicode-escape')
+                print "rest_name:",restaurant_name
                 for idx, word in enumerate(review):
+                    print "test2"
                     if restaurant_name in word:
+                        print "test3"
                         dish_idx.append(idx)
 
                 if len(dish_idx) > 0:
+                    print "test4"
                     for idx in dish_idx:
+                        print "test5"
                         cnt = 1
                         while True:
+                            print "test6"
                             if idx+cnt < len(review):
                                 if "_senti" in review[idx+cnt]:
                                     length_list.append(cnt)
@@ -579,8 +604,15 @@ class ReviewParser:
                             elif idx+cnt > len(review) and idx-cnt < 0:
                                 break
                             cnt+=1
-        avg_length = float(sum(length_list))/float(len(length_list))
 
+            if self.switch:
+                sys.stdout.write("\rStatus: %s / %s"%(processing_cnt, total_length))
+                sys.stdout.flush()
+            processing_cnt+=1
+
+        avg_length = float(sum(length_list))/float(len(length_list))
+        #print "avg_length: ",avg_length
+        #sys.exit("600stop")
         return avg_length
 
     def render(self):
