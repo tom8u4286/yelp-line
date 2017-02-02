@@ -169,6 +169,11 @@ class DishScore:
             ordered_dict["rank_by_avg"] = item["rank_by_avg"]
             ordered_dict["rank_by_max"] = item["rank_by_max"]
             ordered_dict["avg_cos"] = item["avg_cos"]
+            ordered_dict["sum_higher0_cos"] = item["sum_higher0_cos"]
+            ordered_dict["sum_higher02_cos"] = item["sum_higher02_cos"]
+            ordered_dict["sum_higher04_cos"] = item["sum_higher04_cos"]
+            ordered_dict["sum_higher06_cos"] = item["sum_higher06_cos"]
+            ordered_dict["sum_higher08_cos"] = item["sum_higher08_cos"]
             ordered_dict["max_cos_10"] = NoIndent(item["max_cos_10"])
             ordered_dict["max_words"] = NoIndent(item["max_words"])
             ordered_dict_list.append(ordered_dict)
