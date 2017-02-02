@@ -1,6 +1,7 @@
 import json
 import uuid
 from collections import OrderedDict
+import sys
 class NoIndent(object):
     def __init__(self, value):
         self.value = value
@@ -77,6 +78,7 @@ for rest_num in range(1,524):
         rest_2dim = json.load(open("data/vectors/2dim/restaurant_%s_vector2_type3.json"%rest_num))
     except:
         print "cannot open file restaurant_%s"%rest_num
+        rest_cnt+=1
         continue
 
     frq_list = []
@@ -85,15 +87,15 @@ for rest_num in range(1,524):
             if dish["rank_by_frq"] == i:
                 dic = OrderedDict()
                 dic["index"] = i
-                dic["name"] = dish["dish"].split("_")[:-1]
+                dic["name"] = dish["dish"].strip("_"+rest_dict["restaurant_name"].lower().replace(" ","-"))
                 dic["name_ar"] = dish["dish"]
                 dic["count"] = dish["dish_cnt"]
                 dic["cosine_avg_score"] = dish["sum_higher06_cos"]
                 dic["cosine_max_score"] = dish["max_cos_10"][0]
-                dic["cosine_nearest"] = [{"word":word,"cosine_similarity":cos} for word, cos in zip(dish["max_cos_10"][-5:],dish["max_words"][-5:])]
-                dic["euclidean_avg_score"] = 0
-                dic["euclidean_min_score"] = 0
-                dic["euclidean_nearest"] = [{"word":word,"cosine_similarity":cos} for word, cos in zip(dish["max_cos_10"][-5:],dish["max_words"][-5:])]
+                dic["cosine_nearest"] = NoIndent([{"word":word,"cosine_similarity":cos} for cos, word in zip(dish["max_cos_10"],dish["max_words"])])
+                dic["euclidean_avg_score"] = dish["sum_higher06_cos"]
+                dic["euclidean_min_score"] = dish["max_cos_10"][0]
+                dic["euclidean_nearest"] = NoIndent([{"word":word,"cosine_similarity":cos} for cos, word in zip(dish["max_cos_10"],dish["max_words"])])
                 for w in rest_2dim:
                     if w["word"] == dish["dish"]:
                         dic["x"] = w["vector2"][0]
@@ -108,15 +110,15 @@ for rest_num in range(1,524):
             if dish["rank_by_sum_higher_cos"]["0.6"] == i:
                 dic = OrderedDict()
                 dic["index"] = i
-                dic["name"] = dish["dish"].split("_")[:-1]
+                dic["name"] = dish["dish"].strip("_"+rest_dict["restaurant_name"].lower().replace(" ","-"))
                 dic["name_ar"] = dish["dish"]
                 dic["count"] = dish["dish_cnt"]
                 dic["cosine_avg_score"] = dish["sum_higher06_cos"]
                 dic["cosine_max_score"] = dish["max_cos_10"][0]
-                dic["cosine_nearest"] = [{"word":word,"cosine_similarity":cos} for word, cos in zip(dish["max_cos_10"][-5:],dish["max_words"][-5:])]
-                dic["euclidean_avg_score"] = 0
-                dic["euclidean_min_score"] = 0
-                dic["euclidean_nearest"] = [{"word":word,"cosine_similarity":cos} for word, cos in zip(dish["max_cos_10"][-5:],dish["max_words"][-5:])]
+                dic["cosine_nearest"] = NoIndent( [{"word":word,"cosine_similarity":cos} for cos, word in zip(dish["max_cos_10"],dish["max_words"])])
+                dic["euclidean_avg_score"] = dish["sum_higher06_cos"]
+                dic["euclidean_min_score"] = dish["max_cos_10"][0]
+                dic["euclidean_nearest"] = NoIndent( [{"word":word,"cosine_similarity":cos} for cos, word in zip(dish["max_cos_10"],dish["max_words"])])
                 for w in rest_2dim:
                     if w["word"] == dish["dish"]:
                         dic["x"] = w["vector2"][0]
@@ -131,21 +133,21 @@ for rest_num in range(1,524):
             if dish["rank_by_max"] == i:
                 dic = OrderedDict()
                 dic["index"] = i
-                dic["name"] = dish["dish"].split("_")[:-1]
+                dic["name"] = dish["dish"].strip("_"+rest_dict["restaurant_name"].lower().replace(" ","-"))
                 dic["name_ar"] = dish["dish"]
                 dic["count"] = dish["dish_cnt"]
                 dic["cosine_avg_score"] = dish["sum_higher06_cos"]
                 dic["cosine_max_score"] = dish["max_cos_10"][0]
-                dic["cosine_nearest"] = [{"word":word,"cosine_similarity":cos} for word, cos in zip(dish["max_cos_10"][-5:],dish["max_words"][-5:])]
-                dic["euclidean_avg_score"] = 0
-                dic["euclidean_min_score"] = 0
-                dic["euclidean_nearest"] = [{"word":word,"cosine_similarity":cos} for word, cos in zip(dish["max_cos_10"][-5:],dish["max_words"][-5:])]
+                dic["cosine_nearest"] = NoIndent( [{"word":word,"cosine_similarity":cos} for cos, word in zip(dish["max_cos_10"],dish["max_words"])])
+                dic["euclidean_avg_score"] = dish["sum_higher06_cos"]
+                dic["euclidean_min_score"] = dish["max_cos_10"][0]
+                dic["euclidean_nearest"] = NoIndent( [{"word":word,"cosine_similarity":cos} for cos, word in zip(dish["max_cos_10"],dish["max_words"])])
                 for w in rest_2dim:
                     if w["word"] == dish["dish"]:
                         dic["x"] = w["vector2"][0]
                         dic["y"] = w["vector2"][1]
                         break
-                cos_list.append(dic)
+                cos_max_list.append(dic)
                 break
 
 
@@ -161,6 +163,7 @@ for rest_num in range(1,524):
     rest_dic["top5_euclidean_avg"] = cos_list
     rest_dic["top5_euclidean_min"] = cos_max_list
     dict_list.append(rest_dic)
+    rest_cnt+=1
 
 f_dict_list = open("data/frontend_restaurant_dict_list.json","w+")
 f_dict_list.write(json.dumps(dict_list, indent=4, cls=NoIndentEncoder))
