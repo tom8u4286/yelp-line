@@ -30,6 +30,16 @@ class Tsne:
         model = TSNE(n_components=2, random_state=0)
         print "tsne start.."
         self.array = model.fit_transform(self.array)
+        #normalizing
+        old_xs = [vec[0] for vec in self.array]
+        old_ys = [vec[1] for vec in self.array]
+        min_x = min(old_xs)
+        max_x = max(old_xs)
+        new_xs = [2*(num-min_x)/(max_x-min_x)-1 for num in old_xs]
+        min_y = min(old_ys)
+        max_y = max(old_ys)
+        new_ys = [2*(num-min_y)/(max_y-min_y)-1 for num in old_ys]
+        self.array =[[x,y] for x,y in zip(new_xs,new_ys)]
 
         total = []
         for i in xrange(len(self.words)):

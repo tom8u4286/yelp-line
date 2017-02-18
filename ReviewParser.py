@@ -18,7 +18,7 @@ class ReviewParser:
     def __init__(self):
         print "Processing", sys.argv[1]
         self.src = sys.argv[1]  # E.g. data/reviews/restaurant_3.json
-        self.src_b = 'data/business_list.json'
+        self.src_b = 'data/new_business_list.json'
 
         self.backend_reviews = []
         self.frontend_reviews = []
@@ -46,6 +46,7 @@ class ReviewParser:
         for business in business_list:
             if business["business_id"] == review_dic["business_id"]:
                 matched_business = business
+                break
 
         return matched_business
 
@@ -482,6 +483,7 @@ class ReviewParser:
         total_review_count = len(self.clean_reviews)
         """ (1) render restaurant_*.json in ./frontend_reviews """
 
+        business = self.get_business()
         orderedDict1 = OrderedDict()
         orderedDict1["restaurant_name"] = business["business_name"]
         orderedDict1["restaurant_id"] = business["business_id"]
@@ -574,25 +576,25 @@ class ReviewParser:
         #sys.exit("stop")
         for review in self.backend_reviews:
             if "_senti" in review:
-                print "test1"
+                #print "test1"
                 review = review.split(" ")
                 dish_idx = []
-                print "before stemmed: ",self.restaurant_name
+                #print "before stemmed: ",self.restaurant_name
                 restaurant_name = stemmer.stem(self.restaurant_name.lower().replace(" ","-").replace("&", "and").replace("\'", "").replace(".", "").replace(",","")).decode('unicode-escape')
-                print "rest_name:",restaurant_name
+                #print "rest_name:",restaurant_name
                 for idx, word in enumerate(review):
-                    print "test2"
+                    #print "test2"
                     if restaurant_name in word:
-                        print "test3"
+                        #print "test3"
                         dish_idx.append(idx)
 
                 if len(dish_idx) > 0:
-                    print "test4"
+                    #print "test4"
                     for idx in dish_idx:
-                        print "test5"
+                        #print "test5"
                         cnt = 1
                         while True:
-                            print "test6"
+                            #print "test6"
                             if idx+cnt < len(review):
                                 if "_senti" in review[idx+cnt]:
                                     length_list.append(cnt)
@@ -620,7 +622,7 @@ class ReviewParser:
         business = self.get_business()
         self.menu = self.get_clean_menu()
         self.clean_reviews = self.get_clean_reviews()
-        #self.frontend_review_dict_list = self.get_frontend_review_dict_list()
+        self.frontend_review_dict_list = self.get_frontend_review_dict_list()
         self.backend_reviews = self.get_backend_reviews()
 
         restaurant_dict = self.get_restaurant_dict()
@@ -638,7 +640,7 @@ class ReviewParser:
             if sys.argv[1][26] != ".":
                 self.filename = self.filename + sys.argv[1][26]
 
-        #self.render_frontend_reviews()
+        self.render_frontend_reviews()
         self.render_backend_reviews()
         self.render_restaurant_dict(restaurant_dict)
         #self.render_sentiment_statistics_reviews()
