@@ -225,7 +225,7 @@ class DishScore:
         #ax,set_ylim(-1,1)
 
         for dish in dish_list:
-            print dish
+            print dish["sum_higher06_cos"]
         sys.exit("stop228")
 
 class NoIndent(object):
