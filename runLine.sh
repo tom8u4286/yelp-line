@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-for i in data/cooccurrence/restaurant_1_cooccur_type1.txt
+for i in data/cooccurrence/restaurant_*_cooccur_type1.txt
 do
     echo "Running Line (first-order) on:\033[1m" $i "\033[0m"
     filename=$(echo $i | cut -d'/' -f 3)
@@ -13,7 +13,7 @@ do
 done    
 ts -S 20
 
-for i in data/cooccurrence/restaurant_1_cooccur_type2.txt
+for i in data/cooccurrence/restaurant_*_cooccur_type2.txt
 do
     echo "Running Line (first-order) on:\033[1m" $i "\033[0m"
     filename=$(echo $i | cut -d'/' -f 3)
@@ -25,7 +25,7 @@ do
     echo "-------------------------------------------"
 done
 ts -S 1
-for i in data/cooccurrence/restaurant_1_cooccur_type3.txt
+for i in data/cooccurrence/restaurant_*_cooccur_type3.txt
 do
     echo "Running Line (first-order) on:\033[1m" $i "\033[0m"
     filename=$(echo $i | cut -d'/' -f 3)
@@ -37,7 +37,7 @@ do
     echo "-------------------------------------------"
 done 
 ts -S 1
-for i in data/cooccurrence/restaurant_1_cooccur_type4.txt
+for i in data/cooccurrence/restaurant_*_cooccur_type4.txt
 do
     echo "Running Line (first-order) on:\033[1m" $i "\033[0m"
     filename=$(echo $i | cut -d'/' -f 3)

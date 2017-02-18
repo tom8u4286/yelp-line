@@ -5,8 +5,6 @@ import scipy.stats as stats
 import re
 from collections import OrderedDict
 from nltk.stem.snowball import SnowballStemmer
-import matplotlib
-import matplotlib.pyplot as plt
 
 class DishScore:
 
@@ -218,16 +216,6 @@ class DishScore:
         f.close()
         print "DishScore.py rest_%s_type%s completed"%(self.rest_num, self.build_type)
 
-    def plot(self, dish_list):
-        matplotlib.rcParams['axes.unicode_minus'] = False
-        fig, ax = plt.subplots()
-        #ax,set_xlim(-1,1)
-        #ax,set_ylim(-1,1)
-
-        for dish in dish_list:
-            print dish["sum_higher06_cos"]
-        sys.exit("stop228")
-
 class NoIndent(object):
     def __init__(self, value):
         self.value = value
@@ -257,5 +245,4 @@ if __name__ == "__main__":
     dishScore = DishScore()
     dish_list = dishScore.calculate()
     rank_by_avg = dishScore.rank(dish_list)
-    dishScore.plot(dish_list)
     dishScore.render(rank_by_avg)
