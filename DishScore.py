@@ -4,6 +4,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import scipy.stats as stats
 import re
 from collections import OrderedDict
+from nltk.stem.snowball import SnowballStemmer
 
 class DishScore:
 
@@ -31,18 +32,20 @@ class DishScore:
         return words, vectors
 
     def get_rest_name(self):
-        f_res_dic = open(self.rest_dic_src)
+        f_res_dic = open(self.rest_dic_list_src)
         rest_dic = json.load(f_res_dic)
-        rest_name = ""
-        for rest in rest_dic:
-            if rest["index"] == self.rest_num:
-                rest_name = rest["restaurant_name"]
+        rest_name = rest_dic["restaurant_name"]
+        #for rest in rest_dic:
+        #    if rest["index"] == self.rest_num:
+        #        rest_name = rest["restaurant_name"]
         return rest_name
 
     def get_indices(self, words, vectors):
         senti_indices = []
         dish_indices = []
-        rest_name = self.get_rest_name().lower().replace(" ","-")
+        rest_name = self.get_rest_name().lower().replace(" ","-").replace("&", "and").replace("\'", "").replace(".", "").replace(",","")
+        stemmer = SnowballStemmer('english')
+        rest_name = stemmer.stem(rest_name)
         #print "rest name:",rest_name
         for idx, word in enumerate(words):
             if "_senti" in word:
@@ -208,8 +211,6 @@ class DishScore:
         return p_at10, p_at20, p_at30
 
     def render(self, dish_list):
-
-
         f = open("data/rank/restaurant_%s_rank_type%s.json"%(self.rest_num, self.build_type),"w+")
         f.write(json.dumps(dish_list ,indent = 4, cls=NoIndentEncoder))
         f.close()
