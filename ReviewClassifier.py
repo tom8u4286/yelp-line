@@ -7,7 +7,7 @@ class ReviewClassifier:
     """ This program aims to (1) filter out redundant reviews (2) classify the reviews of the matched restaurants """
 
     def __init__(self):
-        self.src_b = "data/business_list.json"
+        self.src_b = "data/new_business_list.json"
         self.src_r = "data/review_list.json"
 
     def get_business_list(self):
@@ -43,7 +43,7 @@ class ReviewClassifier:
 
         cnt = 0
         length = len(business_list)
-        fi = open("data/business_list.json","r")
+        fi = open("data/new_business_list.json","r")
         business_list_file = json.load(fi)
         for business in business_list:
             f = open("data/reviews/restaurant_%s.json"%(cnt+1), "w+")

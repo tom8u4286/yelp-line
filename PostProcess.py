@@ -36,7 +36,7 @@ for r in range(1,524):
     try:
         f_voc = open("data/voc/restaurant_%s_voc.txt"%r)
     except:
-        print "cannot open rest%r"%r
+        print "cannot open file restaurant_%s_voc.txt"%r
         continue
     voc_list = [line.split(" ") for line in f_voc]
     tmp =[]
@@ -73,10 +73,18 @@ rest_cnt = 1
 for rest_num in range(1,524):
     try:
         rest_rank = json.load( open("data/rank/restaurant_%s_rank_type3.json"%rest_num))
+    except:
+        print "cannot open file /rank/restaurant_%s_rank_type3.json"%rest_num
+        rest_cnt+=1
+    try:
         rest_dict = json.load( open("data/restaurant_dict_list/restaurant_dict_%s.json"%rest_num))
+    except:
+        print "cannot open file /restaurant_dict_list/restaurant_dict_%s.json"%rest_num
+        rest_cnt+=1
+    try:
         rest_2dim = json.load( open("data/vectors/2dim/restaurant_%s_vector2_type3.json"%rest_num))
     except:
-        print "cannot open file restaurant_%s"%rest_num
+        print "cannot open file /vectors/2dim/restaurant_%s_vector2_type3.json"%rest_num
         rest_cnt+=1
         continue
 
