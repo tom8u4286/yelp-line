@@ -35,8 +35,6 @@ class Plot_DishAndSenti:
         plt.savefig("data/plot/restaurant_%s_type%s.png"%(self.rest_num, self.build_type))
         self.rest_num = sys.argv[1]
 
-
-
 if __name__ == "__main__":
     plot = Plot_DishAndSenti()
     plot.render()
