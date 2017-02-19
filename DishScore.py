@@ -15,8 +15,8 @@ class DishScore:
         self.vec64_src = sys.argv[1]
         self.rest_num = int(re.search("_([0-9]+)_", sys.argv[1].split("/")[3]).group(1))
         self.build_type = int(re.search("type([0-9]+)", sys.argv[1].split("/")[3]).group(1))
-        self.rest_dic_src ="data/restaurant_dict_list/restaurant_dict_list.json"
-        self.rest_dic_list_src = "data/restaurant_dict_list/restaurant_dict_%s.json"%self.rest_num
+        #self.rest_dic_list_src ="data/restaurant_dict_list/restaurant_dict_list.json"
+        self.rest_dic_src = "data/restaurant_dict_list/restaurant_dict_%s.json"%self.rest_num
         self.rest_dic = {}
 
     def get_words_and_vectors(self):
@@ -32,9 +32,10 @@ class DishScore:
         return words, vectors
 
     def get_rest_name(self):
-        f_res_dic = open(self.rest_dic_list_src)
+        f_res_dic = open(self.rest_dic_src)
         rest_dic = json.load(f_res_dic)
         rest_name = rest_dic["restaurant_name"]
+        #print "rest_name from rest_dic:",rest_name
         #for rest in rest_dic:
         #    if rest["index"] == self.rest_num:
         #        rest_name = rest["restaurant_name"]
@@ -47,11 +48,15 @@ class DishScore:
         stemmer = SnowballStemmer('english')
         rest_name = stemmer.stem(rest_name)
         #print "rest name:",rest_name
+        #sys.exit("stop50")
         for idx, word in enumerate(words):
+            #if "_" in word:
+                #print word
             if "_senti" in word:
                 senti_indices.append(idx)
             elif rest_name in word:
                 dish_indices.append(idx)
+        #sys.exit("stop57")
         return senti_indices, dish_indices
 
     def calculate(self):
@@ -92,7 +97,7 @@ class DishScore:
 
         #rank by frquency
         # 1/2 added by Tom
-        f = open( self.rest_dic_list_src )
+        f = open( self.rest_dic_src )
         rest_dict_list = json.load(f)
         menu = rest_dict_list["menu"]
         for i in range(0, len(dish_list)):
