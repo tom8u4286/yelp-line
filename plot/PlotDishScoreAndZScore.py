@@ -12,12 +12,12 @@ from collections import OrderedDict
 class PlotDishScoreAndSentiCosVar:
 
     def __init__(self):
-        self.vec64_src = "data/vectors/norm_64dim/norm_restaurant_%s_vector64_type%s.txt"%(sys.argv[1],sys.argv[2])
+        #self.vec64_src = sys.argv[1]
         #self.rest_num = int(re.search("_([0-9]+)_", sys.argv[1].split("/")[3]).group(1))
-        self.rest_num = sys.argv[1]
         #self.build_type = int(re.search("type([0-9]+)", sys.argv[1].split("/")[3]).group(1))
+        self.vec64_src = "../data/vectors/norm_64dim/norm_restaurant_%s_vector64_type%s.txt"%(sys.argv[1],sys.argv[2])
+        self.rest_num = sys.argv[1]
         self.build_type = sys.argv[2]
-        self.senti_file_src = "data/frontend_sentiment/frontend_sentiment_rest%s.json"%self.rest_num
         self.rest_dic_src ="data/restaurant_dict_list/restaurant_dict_list.json"
         self.rest_dic_list_src = "data/restaurant_dict_list/restaurant_dict_%s.json"%self.rest_num
         self.rest_dic = {}
@@ -57,17 +57,9 @@ class PlotDishScoreAndSentiCosVar:
                 dish_indices.append(idx)
         return senti_indices, dish_indices
 
-    def get_senti_dic_list(self):
-        f = open(self.senti_file_src)
-        senti_dic = json.load(f)
-        return senti_dic
-
     def plot(self):
         words, vectors = self.get_words_and_vectors()
         senti_indices, dish_indices = self.get_indices(words, vectors)
-        #print senti_indices, dish_indices
-        #sys.exit("stop61")
-        senti_dic_list = self.get_senti_dic_list()
         rest_name = self.get_rest_name()
         A = np.array(vectors)
         cos_matrix = cosine_similarity(A)
@@ -75,30 +67,20 @@ class PlotDishScoreAndSentiCosVar:
         matplotlib.rcParams['axes.unicode_minus'] = False
         fig, ax = plt.subplots()
         ax.set_title("rest%s: "%self.rest_num+rest_name)
-        ax.set_xlabel('score(sum of senti higher than 0.5)')
-        ax.set_ylabel('z-score*norm(frq)(senti higher than 0.5)')
+        ax.set_xlabel('score(sum of senti higher than 0.6)')
+        ax.set_ylabel('z-score(senti higher than 0.6)')
 
         for dish_index in dish_indices:
             cos_list = []
-            senti_words_list = []
-            total_frq_of_senti = 0
             for senti_index in senti_indices:
-                if cos_matrix[dish_index][senti_index] > 0.5 :
+                if cos_matrix[dish_index][senti_index] > 0.6 :
                     cos_list.append(cos_matrix[dish_index][senti_index] )
-                    senti_words_list.append(words[senti_index])
-                    for senti in senti_dic_list:
-                        if words[senti_index] == senti["word"]:
-                            total_frq_of_senti += senti["count"]
-            #print cos_list
-            #print senti_words_list
-            #sys.exit("stop81")
-            #zscore_list = stats.zscore(np.array(cos_list)).tolist()
-            #avg_zscore = float(sum(zscore_list))/float(len(zscore_list))
-            norm_total_frq_of_senti = float(total_frq_of_senti) / float(max([senti["count"] for senti in senti_dic_list]))
+            zscore_list = stats.zscore(np.array(cos_list)).tolist()
+            avg_zscore = float(sum(zscore_list))/float(len(zscore_list))
             score = sum(cos_list)
-            ax.plot(score, norm_total_frq_of_senti, 'bo')
-
-        plt.show()
+            ax.plot(score, avg_zscore, 'bo')
+        plt.savefig("../data/plot/DishScoreAndZScore/restaurant_%s_DishScoreAndZScore.png"%self.rest_num)
+        #plt.show()
 
 class NoIndent(object):
     def __init__(self, value):
