@@ -1,6 +1,5 @@
 import json, sys, uuid, os
 import numpy as np
-from scipy import stats
 from sklearn.metrics.pairwise import cosine_similarity
 import matplotlib
 import matplotlib.pyplot as plt
@@ -12,9 +11,12 @@ from collections import OrderedDict
 class PlotDishScoreAndSentiCosVar:
 
     def __init__(self):
-        self.vec64_src = sys.argv[1]
-        self.rest_num = int(re.search("_([0-9]+)_", sys.argv[1].split("/")[3]).group(1))
-        self.build_type = int(re.search("type([0-9]+)", sys.argv[1].split("/")[3]).group(1))
+        #self.vec64_src = sys.argv[1]
+        #self.rest_num = int(re.search("_([0-9]+)_", sys.argv[1].split("/")[3]).group(1))
+        #self.build_type = int(re.search("type([0-9]+)", sys.argv[1].split("/")[3]).group(1))
+        self.vec64_src = "../data/vectors/norm_64dim/norm_restaurant_%s_vector64_type%s.txt"%(sys.argv[1],sys.argv[2])
+        self.rest_num = sys.argv[1]
+        self.build_type = sys.argv[2]
         self.rest_dic_src ="data/restaurant_dict_list/restaurant_dict_list.json"
         self.rest_dic_list_src = "data/restaurant_dict_list/restaurant_dict_%s.json"%self.rest_num
         self.rest_dic = {}
@@ -65,19 +67,19 @@ class PlotDishScoreAndSentiCosVar:
         fig, ax = plt.subplots()
         ax.set_title("rest%s: "%self.rest_num+rest_name)
         ax.set_xlabel('score(sum of senti higher than 0.6)')
-        ax.set_ylabel('z-score(senti higher than 0.6)')
+        ax.set_ylabel('variance(senti higher than 0.6)')
 
         for dish_index in dish_indices:
             cos_list = []
             for senti_index in senti_indices:
                 if cos_matrix[dish_index][senti_index] > 0.6 :
                     cos_list.append(cos_matrix[dish_index][senti_index] )
-            zscore_list = stats.zscore(np.array(cos_list)).tolist()
-            avg_zscore = float(sum(zscore_list))/float(len(zscore_list))
+            var = np.var(cos_list)
             score = sum(cos_list)
-            ax.plot(score, avg_zscore, 'bo')
+            ax.plot(score, var, 'bo')
 
-        plt.show()
+        plt.savefig("../data/plot/DishScoreAndSentiCosVar/restaurant_%s_DishScoreAndSentiCosVar.png"%self.rest_num)
+        #plt.show()
 
 class NoIndent(object):
     def __init__(self, value):
