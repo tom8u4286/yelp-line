@@ -59,11 +59,17 @@ class DishScore:
         #sys.exit("stop57")
         return senti_indices, dish_indices
 
+    def get_senti_dic_list(self):
+        f = open("data/frontend_sentiment/frontend_sentiment_rest%s.json"%self.rest_num)
+        senti_dic = json.load(f)
+        return senti_dic
+
     def calculate(self):
         """2017/12/18 Tom"""
         """Render the cosine matrix."""
         words, vectors = self.get_words_and_vectors()
         senti_indices, dish_indices = self.get_indices(words, vectors)
+        senti_dic_list = self.get_senti_dic_list()
         A = np.array(vectors)
         cos_matrix = cosine_similarity(A)
 
@@ -75,8 +81,25 @@ class DishScore:
             higher0_cos = sum( [num for num in cos_list if num > 0.0 ] )
             higher02_cos = sum( [num for num in cos_list if num > 0.2 ] )
             higher04_cos = sum( [num for num in cos_list if num > 0.4 ] )
+            higher05_cos = sum( [num for num in cos_list if num > 0.5 ] )
             higher06_cos = sum( [num for num in cos_list if num > 0.6 ] )
             higher08_cos = sum( [num for num in cos_list if num > 0.8 ] )
+            higher05xfrq = []
+            higher05xnorm_frq = []
+            for senti_index in senti_indices:
+                if cos_matrix[dish_index][senti_index] > 0.5:
+                    senti_frq = 0
+                    frq_list = []
+                    for senti in senti_dic_list:
+                        if senti["word"] == words[senti_index]:
+                            senti_frq = senti["count"]
+                            frq_list.append(senti_frq)
+                    higher05xfrq.append(senti_frq*cos_matrix[dish_index][senti_index])
+                    higher05xnorm_frq.append(senti_frq*(cos_matrix[dish_index][senti_index]/max(frq_list)))
+            sum_higher05xfrq = sum(higher05xfrq)
+            sum_higher05xnorm_frq = sum(higher05xnorm_frq)
+
+
             max_cos_10 = sorted( [cos_matrix[dish_index][senti_index] for senti_index in senti_indices], reverse=True )[:10]
             max_words = [words[ list(cos_matrix[dish_index]).index(max_cos) ] for max_cos in max_cos_10]
 
@@ -85,8 +108,11 @@ class DishScore:
             dic["sum_higher0_cos"] = higher0_cos
             dic["sum_higher02_cos"] = higher02_cos
             dic["sum_higher04_cos"] = higher04_cos
+            dic["sum_higher05_cos"] = higher05_cos
             dic["sum_higher06_cos"] = higher06_cos
             dic["sum_higher08_cos"] = higher08_cos
+            dic["sum_(higher05_cos*frq)"] = sum_higher05xfrq
+            dic["sum_(higher05_cos*norm_frq)"] = sum_higher05xnorm_frq
             dic["max_cos_10"] = max_cos_10
             dic["max_words"] = max_words
             dish_list.append(dic)
@@ -107,6 +133,16 @@ class DishScore:
                     dish_cnt = dish["count"]
                     break
             dish_list[i]["dish_cnt"] = dish_cnt
+
+        #rank by sum_higher05_cos*frq
+        dish_list = sorted(dish_list, key=lambda k: k['sum_(higher05_cos*frq)'][:1], reverse=True)
+        for i in range( 0, len(dish_list)):
+            dish_list[i]["rank_by_sum_(higher05_cos*frq)"] = i+1
+
+        #rank by sum_higher05_cos*norm_frq
+        dish_list = sorted(dish_list, key=lambda k: k['sum_(higher05_cos*norm_frq)'][:1], reverse=True)
+        for i in range( 0, len(dish_list)):
+            dish_list[i]["rank_by_sum_(higher05_cos*norm_frq)"] = i+1
 
         #rank by max_cos_10
         dish_list = sorted(dish_list, key=lambda k: k['max_cos_10'][:1], reverse=True)
@@ -133,6 +169,11 @@ class DishScore:
         for i in range(0, len(dish_list)):
             dish_list[i]["rank_by_sum_higher04_cos"] = i+1
 
+        #rank by sum_higher04_cos of dishes. 1/16 Added by Tom
+        dish_list = sorted(dish_list, key=lambda k: k['sum_higher05_cos'], reverse=True)
+        for i in range(0, len(dish_list)):
+            dish_list[i]["rank_by_sum_higher05_cos"] = i+1
+
         #rank by sum_higher06_cos of dishes. 1/16 Added by Tom
         dish_list = sorted(dish_list, key=lambda k: k['sum_higher06_cos'], reverse=True)
         for i in range(0, len(dish_list)):
@@ -149,12 +190,15 @@ class DishScore:
             dish_list[i]["rank_by_cnt"] = i+1
 
         p_at10_avg, p_at20_avg, p_at30_avg = self.precision(dish_list,"rank_by_avg")
-        p_at10_0, p_at20_0, p_at30_0 = self.precision(dish_list,"rank_by_sum_higher0_cos")
-        p_at10_02, p_at20_02, p_at30_02 = self.precision(dish_list,"rank_by_sum_higher02_cos")
-        p_at10_04, p_at20_04, p_at30_04 = self.precision(dish_list,"rank_by_sum_higher04_cos")
-        p_at10_06, p_at20_06, p_at30_06 = self.precision(dish_list,"rank_by_sum_higher06_cos")
-        p_at10_08, p_at20_08, p_at30_08 = self.precision(dish_list,"rank_by_sum_higher08_cos")
-        p_at10_max, p_at20_max, p_at30_max = self.precision(dish_list,"rank_by_max")
+        p_at10_0, p_at20_0, p_at30_0 = self.precision(dish_list, "rank_by_sum_higher0_cos")
+        p_at10_02, p_at20_02, p_at30_02 = self.precision(dish_list, "rank_by_sum_higher02_cos")
+        p_at10_04, p_at20_04, p_at30_04 = self.precision(dish_list, "rank_by_sum_higher04_cos")
+        p_at10_05, p_at20_05, p_at30_05 = self.precision(dish_list, "rank_by_sum_higher05_cos")
+        p_at10_06, p_at20_06, p_at30_06 = self.precision(dish_list, "rank_by_sum_higher06_cos")
+        p_at10_08, p_at20_08, p_at30_08 = self.precision(dish_list, "rank_by_sum_higher08_cos")
+        p_at10_max, p_at20_max, p_at30_max = self.precision(dish_list, "rank_by_max")
+        p_at10_higher05_cos_frq, p_at20_higher05_cos_frq, p_at30_higher05_cos_frq = self.precision(dish_list, "rank_by_sum_(higher05_cos*frq)")
+        p_at10_higher05_cos_nfrq, p_at20_higher05_cos_nfrq, p_at30_higher05_cos_nfrq = self.precision(dish_list, "rank_by_sum_(higher05_cos*norm_frq)")
         #print "p_at10: %s p_at20: %s p_at30: %s "%(p_at10, p_at20, p_at30)
         #sys.exit("stop")
 
@@ -185,12 +229,15 @@ class DishScore:
             ordered_dict["max_cos_10"] = NoIndent(item["max_cos_10"])
             ordered_dict["max_words"] = NoIndent(item["max_words"])
             ordered_dict_list.append(ordered_dict)
-        dic["precision_avg"] = NoIndent({"at10":p_at10_avg, "at20":p_at20_avg, "at30":p_at30_avg})
-        dic["precision_higher0"] =  NoIndent({"at10":p_at10_0, "at20":p_at20_0, "at30":p_at30_0 })
-        dic["precision_higher02"] =  NoIndent({"at10":p_at10_02, "at20":p_at20_02, "at30":p_at30_02 })
-        dic["precision_higher04"] =  NoIndent({"at10":p_at10_04, "at20":p_at20_04, "at30":p_at30_04 })
-        dic["precision_higher06"] =  NoIndent({"at10":p_at10_06, "at20":p_at20_06, "at30":p_at30_06 })
-        dic["precision_higher08"] =  NoIndent({"at10":p_at10_08, "at20":p_at20_08, "at30":p_at30_08 })
+        dic["percentage_avg"] = NoIndent({"at10":p_at10_avg, "at20":p_at20_avg, "at30":p_at30_avg})
+        dic["percentage_higher0"] =  NoIndent({"at10":p_at10_0, "at20":p_at20_0, "at30":p_at30_0 })
+        dic["percentage_higher02"] =  NoIndent({"at10":p_at10_02, "at20":p_at20_02, "at30":p_at30_02 })
+        dic["percentage_higher04"] =  NoIndent({"at10":p_at10_04, "at20":p_at20_04, "at30":p_at30_04 })
+        dic["percentage_higher05"] =  NoIndent({"at10":p_at10_05, "at20":p_at20_05, "at30":p_at30_05 })
+        dic["percentage_higher06"] =  NoIndent({"at10":p_at10_06, "at20":p_at20_06, "at30":p_at30_06 })
+        dic["percentage_higher08"] =  NoIndent({"at10":p_at10_08, "at20":p_at20_08, "at30":p_at30_08 })
+        dic["percentage_higher05_cosXfrq"] =  NoIndent({"at10":p_at10_higher05_cos_frq, "at20":p_at20_higher05_cos_frq, "at30":p_at30_higher05_cos_frq })
+        dic["percentage_higher05_cosXnorm_frq"] =  NoIndent({"at10":p_at10_higher05_cos_nfrq, "at20":p_at20_higher05_cos_nfrq, "at30":p_at30_higher05_cos_nfrq })
         dic["rank"] = ordered_dict_list
         return dic
 
