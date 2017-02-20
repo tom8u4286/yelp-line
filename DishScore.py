@@ -87,7 +87,6 @@ class DishScore:
             higher08_cos = sum( [num for num in cos_list if num > 0.8 ] )
 
             higher0xfrq = []
-            higher0xnorm_frq = []
 
             frq_list = []
             for senti_index in senti_indices:
@@ -101,17 +100,35 @@ class DishScore:
                     higher0xfrq.append(senti_frq*cos_matrix[dish_index][senti_index])
             sum_higher0xfrq = sum(higher0xfrq)
 
+            cos_list = []
+            frq_list = []
+            higher0xnorm_frq = []
             for senti_index in senti_indices:
                 if cos_matrix[dish_index][senti_index] > 0.0:
-                    senti_frq = 0
-                    frq_list = []
+                    cos_list.append(cos_matrix[dish_index][senti_index])
                     for senti in senti_dic_list:
                         if senti["word"] == words[senti_index]:
-                            senti_frq = senti["count"]
-                            frq_list.append(senti_frq)
-                    higher0xnorm_frq.append(senti_frq*(cos_matrix[dish_index][senti_index]/max(frq_list)))
+                            frq_list.append(senti["count"])
+            for c, f in zip(cos_list, frq_list):
+                higher0xnorm_frq.append(c*f/max(frq_list))
             sum_higher0xnorm_frq = sum(higher0xnorm_frq)
 
+            higher0_zXnorm_frq = []
+            cos_list = []
+            frq_list = []
+            for senti_index in senti_indices:
+                if cos_matrix[dish_index][senti_index] > 0.0:
+                    cos_list.append(cos_matrix[dish_index][senti_index])
+                    for senti in senti_dic_list:
+                        if senti["word"] == words[senti_index]:
+                            frq_list.append(senti["count"])
+            zscore_list = stats.zscore(np.array(cos_list)).tolist()
+            for z,f in zip(zscore_list,frq_list):
+                higher0_zXnorm_frq.append(z*f/max(frq_list))
+            sum_higher0_zXnorm_frq = sum(higher0_zXnorm_frq)
+
+            sum_zscore_top5 = sum( sorted( zscore_list, reverse=True)[:5])
+            sum_zscore_top10 = sum( sorted( zscore_list, reverse=True)[:10])
 
             max_cos_10 = sorted( [cos_matrix[dish_index][senti_index] for senti_index in senti_indices], reverse=True )[:10]
             max_words = [words[ list(cos_matrix[dish_index]).index(max_cos) ] for max_cos in max_cos_10]
@@ -129,6 +146,9 @@ class DishScore:
             #print "sum_higher0xfrq:", sum_higher0xfrq
             #sys.exit("stop129")
             dic["sum_higher0_cosXnorm_frq"] = sum_higher0xnorm_frq
+            dic["sum_higher0_cos_zXnorm_frq"] = sum_higher0_zXnorm_frq
+            dic["sum_higher0_cos_z_top5"] = sum_zscore_top5
+            dic["sum_higher0_cos_z_top10"] = sum_zscore_top10
             dic["max_cos_10"] = max_cos_10
             dic["max_words"] = max_words
             dish_list.append(dic)
@@ -150,16 +170,25 @@ class DishScore:
                     break
             dish_list[i]["dish_cnt"] = dish_cnt
 
-        #print dish_list[0]["max_cos_10"]
-        #sys.exit("stop150")
         #rank by sum_higher05_cos*frq
-        #dish_list = sorted(dish_list, key=lambda k: k['sum_higher0_cosXfrq'][:1], reverse=True)
+        dish_list = sorted(dish_list, key=itemgetter('sum_higher0_cos_z_top5'))
+        for i in range( 0, len(dish_list)):
+            dish_list[i]["rank_by_sum_higher0_cos_z_top5"] = i+1
+
+        #rank by sum_higher05_cos*frq
+        dish_list = sorted(dish_list, key=itemgetter('sum_higher0_cos_z_top10'))
+        for i in range( 0, len(dish_list)):
+            dish_list[i]["rank_by_sum_higher0_cos_z_top10"] = i+1
+
+        #rank by sum_higher05_cos*frq
+        dish_list = sorted(dish_list, key=itemgetter('sum_higher0_cos_zXnorm_frq'))
+        for i in range( 0, len(dish_list)):
+            dish_list[i]["rank_by_sum_higher0_cos_zXnorm_frq"] = i+1
+
         dish_list = sorted(dish_list, key=itemgetter('sum_higher0_cosXfrq'))
         for i in range( 0, len(dish_list)):
             dish_list[i]["rank_by_sum_higher0_cosXfrq"] = i+1
 
-        #rank by sum_higher05_cos*norm_frq
-        #dish_list = sorted(dish_list, key=lambda k: k['sum_higher0_cosXnorm_frq'][:1], reverse=True)
         dish_list = sorted(dish_list, key=itemgetter('sum_higher0_cosXnorm_frq'))
         for i in range( 0, len(dish_list)):
             dish_list[i]["rank_by_sum_higher0_cosXnorm_frq"] = i+1
@@ -218,6 +247,9 @@ class DishScore:
         p_at10_max, p_at20_max, p_at30_max = self.precision(dish_list, "rank_by_max")
         p_at10_higher0_cos_frq, p_at20_higher0_cos_frq, p_at30_higher0_cos_frq = self.precision(dish_list, "rank_by_sum_higher0_cosXfrq")
         p_at10_higher0_cos_nfrq, p_at20_higher0_cos_nfrq, p_at30_higher0_cos_nfrq = self.precision(dish_list, "rank_by_sum_higher0_cosXnorm_frq")
+        p_at10_higher0_cos_z_nfrq, p_at20_higher0_cos_z_nfrq, p_at30_higher0_cos_z_nfrq = self.precision(dish_list, "rank_by_sum_higher0_cos_zXnorm_frq")
+        p_at10_higher0_cos_z_top5, p_at20_higher0_cos_z_top5, p_at30_higher0_cos_z_top5 = self.precision(dish_list, "rank_by_sum_higher0_cos_z_top5")
+        p_at10_higher0_cos_z_top10, p_at20_higher0_cos_z_top10, p_at30_higher0_cos_z_top10 = self.precision(dish_list, "rank_by_sum_higher0_cos_z_top10")
         #print "p_at10: %s p_at20: %s p_at30: %s "%(p_at10, p_at20, p_at30)
         #sys.exit("stop")
 
@@ -257,6 +289,9 @@ class DishScore:
         dic["percentage_higher08"] =  NoIndent({"at10":p_at10_08, "at20":p_at20_08, "at30":p_at30_08 })
         dic["percentage_higher0_cosXfrq"] =  NoIndent({"at10":p_at10_higher0_cos_frq, "at20":p_at20_higher0_cos_frq, "at30":p_at30_higher0_cos_frq })
         dic["percentage_higher0_cosXnorm_frq"] =  NoIndent({"at10":p_at10_higher0_cos_nfrq, "at20":p_at20_higher0_cos_nfrq, "at30":p_at30_higher0_cos_nfrq })
+        dic["percentage_higher0_cos_z_Xnorm_frq"] =  NoIndent({"at10":p_at10_higher0_cos_z_nfrq, "at20":p_at20_higher0_cos_z_nfrq, "at30":p_at30_higher0_cos_z_nfrq })
+        dic["percentage_higher0_cos_z_top5"] =  NoIndent({"at10":p_at10_higher0_cos_z_top5, "at20":p_at20_higher0_cos_z_top5, "at30":p_at30_higher0_cos_z_top5 })
+        dic["percentage_higher0_cos_z_top10"] =  NoIndent({"at10":p_at10_higher0_cos_z_top10, "at20":p_at20_higher0_cos_z_top10, "at30":p_at30_higher0_cos_z_top10 })
         dic["rank"] = ordered_dict_list
         return dic
 
