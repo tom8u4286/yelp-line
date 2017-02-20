@@ -18,8 +18,8 @@ class PlotDishScoreAndSentiCosVar:
         self.vec64_src = "../data/vectors/norm_64dim/norm_restaurant_%s_vector64_type%s.txt"%(sys.argv[1],sys.argv[2])
         self.rest_num = sys.argv[1]
         self.build_type = sys.argv[2]
-        self.rest_dic_src ="data/restaurant_dict_list/restaurant_dict_list.json"
-        self.rest_dic_list_src = "data/restaurant_dict_list/restaurant_dict_%s.json"%self.rest_num
+        #self.rest_dic_src ="data/restaurant_dict_list/restaurant_dict_list.json"
+        self.rest_dic_src = "../data/restaurant_dict_list/restaurant_dict_%s.json"%self.rest_num
         self.rest_dic = {}
 
     def get_words_and_vectors(self):
@@ -35,7 +35,7 @@ class PlotDishScoreAndSentiCosVar:
         return words, vectors
 
     def get_rest_name(self):
-        f_res_dic = open(self.rest_dic_list_src)
+        f_res_dic = open(self.rest_dic_src)
         rest_dic = json.load(f_res_dic)
         rest_name = rest_dic["restaurant_name"]
         #for rest in rest_dic:
@@ -76,7 +76,10 @@ class PlotDishScoreAndSentiCosVar:
                 if cos_matrix[dish_index][senti_index] > 0.6 :
                     cos_list.append(cos_matrix[dish_index][senti_index] )
             zscore_list = stats.zscore(np.array(cos_list)).tolist()
-            avg_zscore = float(sum(zscore_list))/float(len(zscore_list))
+            try:
+                avg_zscore = float(sum(zscore_list))/float(len(zscore_list))
+            except:
+                continue
             score = sum(cos_list)
             ax.plot(score, avg_zscore, 'bo')
         plt.savefig("../data/plot/DishScoreAndZScore/restaurant_%s_DishScoreAndZScore.png"%self.rest_num)

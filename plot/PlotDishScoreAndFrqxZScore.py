@@ -18,8 +18,8 @@ class PlotDishScoreAndSentiCosVar:
         #self.build_type = int(re.search("type([0-9]+)", sys.argv[1].split("/")[3]).group(1))
         self.build_type = sys.argv[2]
         self.senti_file_src = "../data/frontend_sentiment/frontend_sentiment_rest%s.json"%self.rest_num
-        self.rest_dic_src ="../data/restaurant_dict_list/restaurant_dict_list.json"
-        self.rest_dic_list_src = "../data/restaurant_dict_list/restaurant_dict_%s.json"%self.rest_num
+        #self.rest_dic_src ="../data/restaurant_dict_list/restaurant_dict_list.json"
+        self.rest_dic_src = "../data/restaurant_dict_list/restaurant_dict_%s.json"%self.rest_num
         self.rest_dic = {}
 
     def get_words_and_vectors(self):
@@ -35,7 +35,7 @@ class PlotDishScoreAndSentiCosVar:
         return words, vectors
 
     def get_rest_name(self):
-        f_res_dic = open(self.rest_dic_list_src)
+        f_res_dic = open(self.rest_dic_src)
         rest_dic = json.load(f_res_dic)
         rest_name = rest_dic["restaurant_name"]
         #for rest in rest_dic:
