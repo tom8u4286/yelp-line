@@ -130,6 +130,13 @@ class DishScore:
             sum_zscore_top5 = sum( sorted( zscore_list, reverse=True)[:5])
             sum_zscore_top10 = sum( sorted( zscore_list, reverse=True)[:10])
 
+            f_coo = open("data/cooccurrence/restaurant_%s_cooccur_type3.txt"%self.rest_num)
+            coo_count = 0
+            for line in f_coo:
+                lst = line.split(" ")
+                if words[dish_index] == lst[0] and "_senti" in lst[1]:
+                    coo_count += float(lst[2].strip("\n"))
+
             max_cos_10 = sorted( [cos_matrix[dish_index][senti_index] for senti_index in senti_indices], reverse=True )[:10]
             max_cos_1 = sorted( [cos_matrix[dish_index][senti_index] for senti_index in senti_indices], reverse=True )[:1]
             sum_total = sum( sorted( [cos_matrix[dish_index][senti_index] for senti_index in senti_indices], reverse=True ))
@@ -152,6 +159,7 @@ class DishScore:
             dic["max_cos_1"] = max_cos_1
             dic["max_words"] = max_words
             dic["sum_total"] = sum_total
+            dic["sum_senti_coo"] = coo_count
             dish_list.append(dic)
 
         return dish_list
@@ -170,6 +178,11 @@ class DishScore:
                     dish_cnt = dish["count"]
                     break
             dish_list[i]["dish_cnt"] = dish_cnt
+
+        #rank by sum_higher05_cos*frq
+        dish_list = sorted(dish_list, key=itemgetter('sum_senti_coo'))
+        for i in range( 0, len(dish_list)):
+            dish_list[i]["rank_by_sum_senti_coo"] = i+1
 
         #rank by sum_higher05_cos*frq
         dish_list = sorted(dish_list, key=itemgetter('sum_total'))
@@ -251,6 +264,7 @@ class DishScore:
 
         p_at10_avg, p_at20_avg, p_at30_avg = self.precision(dish_list,"rank_by_avg")
         p_at10_sum, p_at20_sum, p_at30_sum = self.precision(dish_list,"rank_by_sum_total")
+        p_at10_sum_coo, p_at20_sum_coo, p_at30_sum_coo = self.precision(dish_list,"rank_by_sum_senti_coo")
         p_at10_0, p_at20_0, p_at30_0 = self.precision(dish_list, "rank_by_sum_higher0_cos")
         p_at10_02, p_at20_02, p_at30_02 = self.precision(dish_list, "rank_by_sum_higher02_cos")
         p_at10_04, p_at20_04, p_at30_04 = self.precision(dish_list, "rank_by_sum_higher04_cos")
@@ -295,17 +309,19 @@ class DishScore:
             ordered_dict["max_cos_10"] = NoIndent(item["max_cos_10"])
             ordered_dict["max_cos_1"] = NoIndent(item["max_cos_1"])
             ordered_dict["max_words"] = NoIndent(item["max_words"])
+            ordered_dict["sum_senti_coo"] = NoIndent(item["sum_senti_coo"])
             ordered_dict_list.append(ordered_dict)
         dic["percentage_avg"] = NoIndent({"at10":p_at10_avg, "at20":p_at20_avg, "at30":p_at30_avg})
+        dic["percentage_sum_senti_coo"] = NoIndent({"at10":p_at10_sum_coo, "at20":p_at20_sum_coo, "at30":p_at30_sum_coo})
         dic["percentage_sum_total"] = NoIndent({"at10":p_at10_sum, "at20":p_at20_sum, "at30":p_at30_sum})
-        dic["percentage_higher0"] =  NoIndent({"at10":p_at10_0, "at20":p_at20_0, "at30":p_at30_0 })
-        dic["percentage_higher02"] =  NoIndent({"at10":p_at10_02, "at20":p_at20_02, "at30":p_at30_02 })
-        dic["percentage_higher04"] =  NoIndent({"at10":p_at10_04, "at20":p_at20_04, "at30":p_at30_04 })
-        dic["percentage_higher05"] =  NoIndent({"at10":p_at10_05, "at20":p_at20_05, "at30":p_at30_05 })
-        dic["percentage_higher06"] =  NoIndent({"at10":p_at10_06, "at20":p_at20_06, "at30":p_at30_06 })
-        dic["percentage_higher08"] =  NoIndent({"at10":p_at10_08, "at20":p_at20_08, "at30":p_at30_08 })
-        dic["percentage_max_10"] =  NoIndent({"at10":p_at10_max_10, "at20":p_at20_max_10, "at30":p_at30_max_10 })
-        dic["percentage_max_1"] =  NoIndent({"at10":p_at10_max_1, "at20":p_at20_max_1, "at30":p_at30_max_1 })
+        dic["percentage_higher0"] = NoIndent({"at10":p_at10_0, "at20":p_at20_0, "at30":p_at30_0 })
+        dic["percentage_higher02"] = NoIndent({"at10":p_at10_02, "at20":p_at20_02, "at30":p_at30_02 })
+        dic["percentage_higher04"] = NoIndent({"at10":p_at10_04, "at20":p_at20_04, "at30":p_at30_04 })
+        dic["percentage_higher05"] = NoIndent({"at10":p_at10_05, "at20":p_at20_05, "at30":p_at30_05 })
+        dic["percentage_higher06"] = NoIndent({"at10":p_at10_06, "at20":p_at20_06, "at30":p_at30_06 })
+        dic["percentage_higher08"] = NoIndent({"at10":p_at10_08, "at20":p_at20_08, "at30":p_at30_08 })
+        dic["percentage_max_10"] = NoIndent({"at10":p_at10_max_10, "at20":p_at20_max_10, "at30":p_at30_max_10 })
+        dic["percentage_max_1"] = NoIndent({"at10":p_at10_max_1, "at20":p_at20_max_1, "at30":p_at30_max_1 })
         dic["percentage_higher0_cosXfrq"] =  NoIndent({"at10":p_at10_higher0_cos_frq, "at20":p_at20_higher0_cos_frq, "at30":p_at30_higher0_cos_frq })
         dic["percentage_higher0_cosXnorm_frq"] = NoIndent({"at10":p_at10_higher0_cos_nfrq, "at20":p_at20_higher0_cos_nfrq, "at30":p_at30_higher0_cos_nfrq })
         dic["percentage_higher0_cos_z_Xnorm_frq"] = NoIndent({"at10":p_at10_higher0_cos_z_nfrq, "at20":p_at20_higher0_cos_z_nfrq, "at30":p_at30_higher0_cos_z_nfrq })
