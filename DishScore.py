@@ -179,35 +179,37 @@ class DishScore:
                     break
             dish_list[i]["dish_cnt"] = dish_cnt
 
-        #rank by sum_higher05_cos*frq
+        #rank by sum_senti_coo
         dish_list = sorted(dish_list, key=itemgetter('sum_senti_coo'))
         for i in range( 0, len(dish_list)):
             dish_list[i]["rank_by_sum_senti_coo"] = i+1
 
-        #rank by sum_higher05_cos*frq
+        #rank by sum_total
         dish_list = sorted(dish_list, key=itemgetter('sum_total'))
         for i in range( 0, len(dish_list)):
             dish_list[i]["rank_by_sum_total"] = i+1
 
-        #rank by sum_higher05_cos*frq
+        #rank by sum_higher0_cos_z_top5
         dish_list = sorted(dish_list, key=itemgetter('sum_higher0_cos_z_top5'))
         for i in range( 0, len(dish_list)):
             dish_list[i]["rank_by_sum_higher0_cos_z_top5"] = i+1
 
-        #rank by sum_higher05_cos*frq
+        #rank by sum_higher0_cos_z_top10
         dish_list = sorted(dish_list, key=itemgetter('sum_higher0_cos_z_top10'))
         for i in range( 0, len(dish_list)):
             dish_list[i]["rank_by_sum_higher0_cos_z_top10"] = i+1
 
-        #rank by sum_higher05_cos*frq
+        #rank by sum_higher0_cos_zXnorm_frq
         dish_list = sorted(dish_list, key=itemgetter('sum_higher0_cos_zXnorm_frq'))
         for i in range( 0, len(dish_list)):
             dish_list[i]["rank_by_sum_higher0_cos_zXnorm_frq"] = i+1
 
+        #rank by sum_higher0_cosXfrq
         dish_list = sorted(dish_list, key=itemgetter('sum_higher0_cosXfrq'))
         for i in range( 0, len(dish_list)):
             dish_list[i]["rank_by_sum_higher0_cosXfrq"] = i+1
 
+        #rank by sum_higher0_cosXnorm_frq
         dish_list = sorted(dish_list, key=itemgetter('sum_higher0_cosXnorm_frq'))
         for i in range( 0, len(dish_list)):
             dish_list[i]["rank_by_sum_higher0_cosXnorm_frq"] = i+1
@@ -262,22 +264,22 @@ class DishScore:
         for i in range(0, len(dish_list)):
             dish_list[i]["rank_by_cnt"] = i+1
 
-        p_at10_avg, p_at20_avg, p_at30_avg = self.precision(dish_list,"rank_by_avg")
-        p_at10_sum, p_at20_sum, p_at30_sum = self.precision(dish_list,"rank_by_sum_total")
-        p_at10_sum_coo, p_at20_sum_coo, p_at30_sum_coo = self.precision(dish_list,"rank_by_sum_senti_coo")
-        p_at10_0, p_at20_0, p_at30_0 = self.precision(dish_list, "rank_by_sum_higher0_cos")
-        p_at10_02, p_at20_02, p_at30_02 = self.precision(dish_list, "rank_by_sum_higher02_cos")
-        p_at10_04, p_at20_04, p_at30_04 = self.precision(dish_list, "rank_by_sum_higher04_cos")
-        p_at10_05, p_at20_05, p_at30_05 = self.precision(dish_list, "rank_by_sum_higher05_cos")
-        p_at10_06, p_at20_06, p_at30_06 = self.precision(dish_list, "rank_by_sum_higher06_cos")
-        p_at10_08, p_at20_08, p_at30_08 = self.precision(dish_list, "rank_by_sum_higher08_cos")
-        p_at10_max_10, p_at20_max_10, p_at30_max_10 = self.precision(dish_list, "rank_by_max_10")
-        p_at10_max_1, p_at20_max_1, p_at30_max_1 = self.precision(dish_list, "rank_by_max_1")
-        p_at10_higher0_cos_frq, p_at20_higher0_cos_frq, p_at30_higher0_cos_frq = self.precision(dish_list, "rank_by_sum_higher0_cosXfrq")
-        p_at10_higher0_cos_nfrq, p_at20_higher0_cos_nfrq, p_at30_higher0_cos_nfrq = self.precision(dish_list, "rank_by_sum_higher0_cosXnorm_frq")
-        p_at10_higher0_cos_z_nfrq, p_at20_higher0_cos_z_nfrq, p_at30_higher0_cos_z_nfrq = self.precision(dish_list, "rank_by_sum_higher0_cos_zXnorm_frq")
-        p_at10_higher0_cos_z_top5, p_at20_higher0_cos_z_top5, p_at30_higher0_cos_z_top5 = self.precision(dish_list, "rank_by_sum_higher0_cos_z_top5")
-        p_at10_higher0_cos_z_top10, p_at20_higher0_cos_z_top10, p_at30_higher0_cos_z_top10 = self.precision(dish_list, "rank_by_sum_higher0_cos_z_top10")
+        p_at5_avg, p_at10_avg, p_at20_avg, p_at30_avg = self.precision(dish_list,"rank_by_avg")
+        p_at5_sum, p_at10_sum, p_at20_sum, p_at30_sum = self.precision(dish_list,"rank_by_sum_total")
+        p_at5_sum_coo, p_at10_sum_coo, p_at20_sum_coo, p_at30_sum_coo = self.precision(dish_list,"rank_by_sum_senti_coo")
+        p_at5_0, p_at10_0, p_at20_0, p_at30_0 = self.precision(dish_list, "rank_by_sum_higher0_cos")
+        p_at5_02, p_at10_02, p_at20_02, p_at30_02 = self.precision(dish_list, "rank_by_sum_higher02_cos")
+        p_at5_04, p_at10_04, p_at20_04, p_at30_04 = self.precision(dish_list, "rank_by_sum_higher04_cos")
+        p_at5_05, p_at10_05, p_at20_05, p_at30_05 = self.precision(dish_list, "rank_by_sum_higher05_cos")
+        p_at5_06, p_at10_06, p_at20_06, p_at30_06 = self.precision(dish_list, "rank_by_sum_higher06_cos")
+        p_at5_08, p_at10_08, p_at20_08, p_at30_08 = self.precision(dish_list, "rank_by_sum_higher08_cos")
+        p_at5_max_10, p_at10_max_10, p_at20_max_10, p_at30_max_10 = self.precision(dish_list, "rank_by_max_10")
+        p_at5_max_1, p_at10_max_1, p_at20_max_1, p_at30_max_1 = self.precision(dish_list, "rank_by_max_1")
+        p_at5_higher0_cos_frq, p_at10_higher0_cos_frq, p_at20_higher0_cos_frq, p_at30_higher0_cos_frq = self.precision(dish_list, "rank_by_sum_higher0_cosXfrq")
+        p_at5_higher0_cos_nfrq, p_at10_higher0_cos_nfrq, p_at20_higher0_cos_nfrq, p_at30_higher0_cos_nfrq = self.precision(dish_list, "rank_by_sum_higher0_cosXnorm_frq")
+        p_at5_higher0_cos_z_nfrq, p_at10_higher0_cos_z_nfrq, p_at20_higher0_cos_z_nfrq, p_at30_higher0_cos_z_nfrq = self.precision(dish_list, "rank_by_sum_higher0_cos_zXnorm_frq")
+        p_at5_higher0_cos_z_top5, p_at10_higher0_cos_z_top5, p_at20_higher0_cos_z_top5, p_at30_higher0_cos_z_top5 = self.precision(dish_list, "rank_by_sum_higher0_cos_z_top5")
+        p_at5_higher0_cos_z_top10, p_at10_higher0_cos_z_top10, p_at20_higher0_cos_z_top10, p_at30_higher0_cos_z_top10 = self.precision(dish_list, "rank_by_sum_higher0_cos_z_top10")
         #print "p_at10: %s p_at20: %s p_at30: %s "%(p_at10, p_at20, p_at30)
         #sys.exit("stop")
 
@@ -311,26 +313,32 @@ class DishScore:
             ordered_dict["max_words"] = NoIndent(item["max_words"])
             ordered_dict["sum_senti_coo"] = NoIndent(item["sum_senti_coo"])
             ordered_dict_list.append(ordered_dict)
-        dic["percentage_avg"] = NoIndent({"at10":p_at10_avg, "at20":p_at20_avg, "at30":p_at30_avg})
-        dic["percentage_sum_senti_coo"] = NoIndent({"at10":p_at10_sum_coo, "at20":p_at20_sum_coo, "at30":p_at30_sum_coo})
-        dic["percentage_sum_total"] = NoIndent({"at10":p_at10_sum, "at20":p_at20_sum, "at30":p_at30_sum})
-        dic["percentage_higher0"] = NoIndent({"at10":p_at10_0, "at20":p_at20_0, "at30":p_at30_0 })
-        dic["percentage_higher02"] = NoIndent({"at10":p_at10_02, "at20":p_at20_02, "at30":p_at30_02 })
-        dic["percentage_higher04"] = NoIndent({"at10":p_at10_04, "at20":p_at20_04, "at30":p_at30_04 })
-        dic["percentage_higher05"] = NoIndent({"at10":p_at10_05, "at20":p_at20_05, "at30":p_at30_05 })
-        dic["percentage_higher06"] = NoIndent({"at10":p_at10_06, "at20":p_at20_06, "at30":p_at30_06 })
-        dic["percentage_higher08"] = NoIndent({"at10":p_at10_08, "at20":p_at20_08, "at30":p_at30_08 })
-        dic["percentage_max_10"] = NoIndent({"at10":p_at10_max_10, "at20":p_at20_max_10, "at30":p_at30_max_10 })
-        dic["percentage_max_1"] = NoIndent({"at10":p_at10_max_1, "at20":p_at20_max_1, "at30":p_at30_max_1 })
-        dic["percentage_higher0_cosXfrq"] =  NoIndent({"at10":p_at10_higher0_cos_frq, "at20":p_at20_higher0_cos_frq, "at30":p_at30_higher0_cos_frq })
-        dic["percentage_higher0_cosXnorm_frq"] = NoIndent({"at10":p_at10_higher0_cos_nfrq, "at20":p_at20_higher0_cos_nfrq, "at30":p_at30_higher0_cos_nfrq })
-        dic["percentage_higher0_cos_z_Xnorm_frq"] = NoIndent({"at10":p_at10_higher0_cos_z_nfrq, "at20":p_at20_higher0_cos_z_nfrq, "at30":p_at30_higher0_cos_z_nfrq })
-        dic["percentage_higher0_cos_z_top5"] = NoIndent({"at10":p_at10_higher0_cos_z_top5, "at20":p_at20_higher0_cos_z_top5, "at30":p_at30_higher0_cos_z_top5 })
-        dic["percentage_higher0_cos_z_top10"] = NoIndent({"at10":p_at10_higher0_cos_z_top10, "at20":p_at20_higher0_cos_z_top10, "at30":p_at30_higher0_cos_z_top10 })
+        dic["percentage_avg"] = NoIndent({"at5":p_at5_avg, "at10":p_at10_avg, "at20":p_at20_avg, "at30":p_at30_avg})
+        dic["percentage_sum_senti_coo"] = NoIndent({"at5":p_at5_sum_coo, "at10":p_at10_sum_coo, "at20":p_at20_sum_coo, "at30":p_at30_sum_coo})
+        dic["percentage_sum_total"] = NoIndent({"at5":p_at5_sum, "at10":p_at10_sum, "at20":p_at20_sum, "at30":p_at30_sum})
+        dic["percentage_higher0"] = NoIndent({"at5":p_at5_0, "at10":p_at10_0, "at20":p_at20_0, "at30":p_at30_0 })
+        dic["percentage_higher02"] = NoIndent({"at5":p_at5_02, "at10":p_at10_02, "at20":p_at20_02, "at30":p_at30_02 })
+        dic["percentage_higher04"] = NoIndent({"at5":p_at5_04, "at10":p_at10_04, "at20":p_at20_04, "at30":p_at30_04 })
+        dic["percentage_higher05"] = NoIndent({"at5":p_at5_05, "at10":p_at10_05, "at20":p_at20_05, "at30":p_at30_05 })
+        dic["percentage_higher06"] = NoIndent({"at5":p_at5_06, "at10":p_at10_06, "at20":p_at20_06, "at30":p_at30_06 })
+        dic["percentage_higher08"] = NoIndent({"at5":p_at5_08, "at10":p_at10_08, "at20":p_at20_08, "at30":p_at30_08 })
+        dic["percentage_max_10"] = NoIndent({"at5":p_at5_max_10, "at10":p_at10_max_10, "at20":p_at20_max_10, "at30":p_at30_max_10 })
+        dic["percentage_max_1"] = NoIndent({"at5":p_at5_max_1, "at10":p_at10_max_1, "at20":p_at20_max_1, "at30":p_at30_max_1 })
+        dic["percentage_higher0_cosXfrq"] =  NoIndent({"at5":p_at5_higher0_cos_frq, "at10":p_at10_higher0_cos_frq, "at20":p_at20_higher0_cos_frq, "at30":p_at30_higher0_cos_frq })
+        dic["percentage_higher0_cosXnorm_frq"] = NoIndent({"at5":p_at5_higher0_cos_nfrq, "at10":p_at10_higher0_cos_nfrq, "at20":p_at20_higher0_cos_nfrq, "at30":p_at30_higher0_cos_nfrq })
+        dic["percentage_higher0_cos_z_Xnorm_frq"] = NoIndent({"at5":p_at5_higher0_cos_z_nfrq, "at10":p_at10_higher0_cos_z_nfrq, "at20":p_at20_higher0_cos_z_nfrq, "at30":p_at30_higher0_cos_z_nfrq })
+        dic["percentage_higher0_cos_z_top5"] = NoIndent({"at5":p_at5_higher0_cos_z_top5,"at10":p_at10_higher0_cos_z_top5, "at20":p_at20_higher0_cos_z_top5, "at30":p_at30_higher0_cos_z_top5 })
+        dic["percentage_higher0_cos_z_top10"] = NoIndent({"at5":p_at5_higher0_cos_z_top10,"at10":p_at10_higher0_cos_z_top10, "at20":p_at20_higher0_cos_z_top10, "at30":p_at30_higher0_cos_z_top10 })
         dic["rank"] = ordered_dict_list
         return dic
 
     def precision(self, dish_list, method):
+        num = 0.0
+        for dish in dish_list:
+            if dish["rank_by_cnt"] <= 5 and dish[method] <= 5:
+                num +=1.0
+        p_at5 = num / 10.0
+
         num = 0.0
         for dish in dish_list:
             if dish["rank_by_cnt"] <= 10 and dish[method] <= 10:
@@ -349,7 +357,7 @@ class DishScore:
                 num +=1.0
         p_at30 = num / 30.0
 
-        return p_at10, p_at20, p_at30
+        return p_at5, p_at10, p_at20, p_at30
 
     def render(self, dish_list):
         f = open("data/rank/restaurant_%s_rank_type%s.json"%(self.rest_num, self.build_type),"w+")
