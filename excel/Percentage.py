@@ -30,13 +30,17 @@ for sheet, at in zip(sh_list,at_list):
     sheet.write( 1, 9, "menu_length")
     sheet.write( 1, 10, "senti_per_review")
     sheet.write( 1, 11, "dish_senti_avg_len")
+    sheet.write( 1, 12, "avg_word_count_pre_review")
 
     offset = 0
     col = 2
 
-    for r in range(1,21):
+    for r in range(1,517):
         rest_num = r
-        f_rest_dic = open("../data/rank/restaurant_%s_rank_type3.json"%rest_num )
+        try:
+            f_rest_dic = open("../data/rank/restaurant_%s_rank_type3.json"%rest_num )
+        except:
+            continue
         rest_rank_dic = json.load(f_rest_dic)
         f_rest_dic = open("../data/restaurant_dict_list/restaurant_dict_%s.json"%rest_num )
         rest_dic = json.load(f_rest_dic)
@@ -59,6 +63,7 @@ for sheet, at in zip(sh_list,at_list):
         sheet.write(col, 9, rest_dic["menu_length"])
         sheet.write(col, 10, rest_dic["senti_per_review"])
         sheet.write(col, 11, rest_dic["dish_senti_avg_len"])
+        sheet.write(col, 12, rest_dic["avg_word_count_pre_review"])
         col+=1
 
 book.close()
