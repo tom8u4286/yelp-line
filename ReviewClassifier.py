@@ -59,6 +59,7 @@ class ReviewClassifier:
             ordered_dict["index"] = cnt
             ordered_dict["business_id"] = business["business_id"]
             ordered_dict["business_name"] = business["business_name"]
+            ordered_dict["city"] = business["city"]
             ordered_dict["reviews"] = text_list
             for rest in business_list_file:
                 if business["business_id"] == rest["business_id"]:

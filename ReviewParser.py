@@ -29,7 +29,7 @@ class ReviewParser:
 
         self.senti_matched_cnt = 0
 
-        self.switch = 1
+        self.switch = 0
 
     def get_review_dict(self):
         with open(self.src) as f:
@@ -67,14 +67,13 @@ class ReviewParser:
         for dish in menu:
             dish = re.sub("\(.*\)", "", dish)
             dish = dish.replace("(","").replace(")","")
-            dish = dish.replace("&", "and").replace("\'", "").replace("*","").replace("-"," ")
+            dish = dish.replace("&", "").replace("\'", "").replace("*","").replace("-"," ").replace("and","")
             dish = re.sub("(\s)+", " ", dish)
             dish = dish.strip()
             dish = re.sub("(!|@|#|\$|%|\^|\*\:|\;|\.|\,|\"|\'|\\|\/)", r'', dish)
 
             clean_menu.append(dish)
 
-        #print clean_menu
         return clean_menu
 
     def get_dishes_regex(self):
@@ -85,18 +84,22 @@ class ReviewParser:
 
             dishes_regex[i] = dishes_regex[i].lower()
             dishes_regex[i] = dishes_regex[i].split()
-            dishes_regex[i][0]= "(" + dishes_regex[i][0] # adding '(' before the first word
 
-            for word in xrange(len(dishes_regex[i])-1):
-                dishes_regex[i][word] += "\\s*"
+            if len(dishes_regex[i]) == 1:
+                dishes_regex[i][0]= "(" + dishes_regex[i][0] # adding '(' before the first word
+                dishes_regex[i][0] = dishes_regex[i][0][:-1]+ ")"
+                dishes_regex[i][0] += "[a-z]+(s|es|ies)?"
+                dishes_regex[i] = dishes_regex[i][0]
+            else:
+                dishes_regex[i][0]= "(" + dishes_regex[i][0] # adding '(' before the first word
+                for word in xrange(len(dishes_regex[i])-1):
+                    dishes_regex[i][word] += "\\s*"
+                for word in xrange(len(dishes_regex[i])-2):
+                    dishes_regex[i][word] += "|"
 
-            for word in xrange(len(dishes_regex[i])-2):
-                dishes_regex[i][word] += "|"
-
-            dishes_regex[i][len(dishes_regex[i])-2] = dishes_regex[i][len(dishes_regex[i])-2] + ")+"
-            dishes_regex[i] = "".join(dishes_regex[i])[:-1]
-            dishes_regex[i] += "[a-z]+(s|es|ies)?"
-
+                dishes_regex[i][len(dishes_regex[i])-2] = dishes_regex[i][len(dishes_regex[i])-2] + ")+"
+                dishes_regex[i] = "".join(dishes_regex[i])[:-1]
+                dishes_regex[i] += "[a-z]+(s|es|ies)?"
         return dishes_regex
 
     def get_dishes_ar(self):
@@ -104,12 +107,17 @@ class ReviewParser:
         dishes_ar = self.get_clean_menu()
         restaurant_name = self.get_business()['business_name']
         self.restaurant_name = restaurant_name
+        stemmer = SnowballStemmer('english')
 
         for i in xrange(len(dishes_ar)):
             dishes_ar[i] = dishes_ar[i].replace(" ", "-") + "_" + restaurant_name.replace(" ", "-")
             dishes_ar[i] = re.sub("(\s)+", r" ", dishes_ar[i])
-            dishes_ar[i] = dishes_ar[i].lower().replace("&", "and").replace("\'", "").replace(".", "").replace(",","")
+            dishes_ar[i] = dishes_ar[i].lower().replace("&", "").replace("\'", "").replace(".", "").replace(",","")
+            dishes_ar[i] = stemmer.stem(dishes_ar[i])
 
+        #for dish in dishes_ar:
+        #    print dish
+        #sys.exit("stop121")
         return dishes_ar
 
     def get_marked_dishes(self):
@@ -287,7 +295,13 @@ class ReviewParser:
             #"""remove stop words"""
             #filtered_sentence = [w for w in word_tokens if not w in stop_words]
             """stemming"""
-            filtered_sentence = [stemmer.stem(w) for w in word_tokens]
+            #filtered_sentence = [stemmer.stem(w) for w in word_tokens]
+            filtered_sentence = []
+            for w in word_tokens:
+                if "_" in w:
+                    filtered_sentence.append(w)
+                else:
+                    filtered_sentence.append(stemmer.stem(w))
             """join back the review from a list to a string"""
             new_review = " ".join(filtered_sentence)
             new_reviews_list.append(new_review)
@@ -327,7 +341,6 @@ class ReviewParser:
         dishes_regex = self.get_dishes_regex()
         dishes_ar = self.get_dishes_ar()
 
-
         if self.switch:
             print "\n" + "-"*70
             print "Processing backend_reviews, change the dish into dish_ar.."
@@ -345,9 +358,6 @@ class ReviewParser:
                     sys.stdout.write("\rStatus: %s / %s | %s / %s    "%(i+1, length1, j+1, length2))
                     sys.stdout.flush()
 
-        #f = open("test.json","w+")
-        #f.write(json.dumps(backend_reviews, indent=4, cls=NoIndentEncoder))
-        #sys.exit("stop")
 
         backend_reviews = self.stem(backend_reviews)
         if self.switch:
@@ -580,7 +590,7 @@ class ReviewParser:
                 review = review.split(" ")
                 dish_idx = []
                 #print "before stemmed: ",self.restaurant_name
-                restaurant_name = stemmer.stem(self.restaurant_name.lower().replace(" ","-").replace("&", "and").replace("\'", "").replace(".", "").replace(",","")).decode('unicode-escape')
+                restaurant_name = stemmer.stem(self.restaurant_name.lower().replace(" ","-").replace("&", "").replace("\'", "").replace(".", "").replace(",","")).decode('unicode-escape')
                 #print "rest_name:",restaurant_name
                 for idx, word in enumerate(review):
                     #print "test2"

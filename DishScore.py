@@ -32,32 +32,21 @@ class DishScore:
             vectors.append(vec)
         return words, vectors
 
-    def get_rest_name(self):
+    def get_append_rest_name(self):
         f_res_dic = open(self.rest_dic_src)
         rest_dic = json.load(f_res_dic)
-        rest_name = rest_dic["restaurant_name"]
-        #print "rest_name from rest_dic:",rest_name
-        #for rest in rest_dic:
-        #    if rest["index"] == self.rest_num:
-        #        rest_name = rest["restaurant_name"]
-        return rest_name
+        append_rest_name = rest_dic["append_rest_name"]
+        return append_rest_name
 
     def get_indices(self, words, vectors):
         senti_indices = []
         dish_indices = []
-        rest_name = self.get_rest_name().lower().replace(" ","-").replace("&", "and").replace("\'", "").replace(".", "").replace(",","")
-        stemmer = SnowballStemmer('english')
-        rest_name = stemmer.stem(rest_name)
-        #print "rest name:",rest_name
-        #sys.exit("stop50")
+        append_rest_name = self.get_append_rest_name()
         for idx, word in enumerate(words):
-            #if "_" in word:
-                #print word
             if "_senti" in word:
                 senti_indices.append(idx)
-            elif rest_name in word:
+            elif append_rest_name in word:
                 dish_indices.append(idx)
-        #sys.exit("stop57")
         return senti_indices, dish_indices
 
     def get_senti_dic_list(self):
@@ -123,8 +112,8 @@ class DishScore:
                         if senti["word"] == words[senti_index]:
                             frq_list.append(senti["count"])
             zscore_list = stats.zscore(np.array(cos_list)).tolist()
-            for z,f in zip(zscore_list,frq_list):
-                higher0_zXnorm_frq.append(z*f/max(frq_list))
+            for c,z,f in zip(cos_list, zscore_list, frq_list):
+                higher0_zXnorm_frq.append(c*z*f/max(frq_list))
             sum_higher0_zXnorm_frq = sum(higher0_zXnorm_frq)
 
             sum_zscore_top5 = sum( sorted( zscore_list, reverse=True)[:5])
@@ -302,6 +291,8 @@ class DishScore:
             ordered_dict["rank_by_avg"] = item["rank_by_avg"]
             ordered_dict["rank_by_max_10"] = item["rank_by_max_10"]
             ordered_dict["rank_by_max_1"] = item["rank_by_max_1"]
+            ordered_dict["rank_by_sum_higher0_cos_zXnorm_frq"] = item["rank_by_sum_higher0_cos_zXnorm_frq"]
+            ordered_dict["rank_by_sum_total"] = item["rank_by_sum_total"]
             ordered_dict["avg_cos"] = item["avg_cos"]
             ordered_dict["sum_higher0_cos"] = item["sum_higher0_cos"]
             ordered_dict["sum_higher02_cos"] = item["sum_higher02_cos"]
@@ -312,6 +303,7 @@ class DishScore:
             ordered_dict["max_cos_1"] = NoIndent(item["max_cos_1"])
             ordered_dict["max_words"] = NoIndent(item["max_words"])
             ordered_dict["sum_senti_coo"] = NoIndent(item["sum_senti_coo"])
+            ordered_dict["rank_by_sum_higher0_cosXfrq"] = NoIndent(item["rank_by_sum_higher0_cosXfrq"])
             ordered_dict_list.append(ordered_dict)
         dic["percentage_avg"] = NoIndent({"at5":p_at5_avg, "at10":p_at10_avg, "at20":p_at20_avg, "at30":p_at30_avg})
         dic["percentage_sum_senti_coo"] = NoIndent({"at5":p_at5_sum_coo, "at10":p_at10_sum_coo, "at20":p_at20_sum_coo, "at30":p_at30_sum_coo})

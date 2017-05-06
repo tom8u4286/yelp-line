@@ -32,7 +32,7 @@ lexicon_list = json.load(f_lexicon)
 lexicon_list = ["-".join(line.split(" ")[:-1])+"_senti" for line in lexicon_list]
 
 #Rendering the frontend_sentiment_statistics.json
-for r in range(1,524):
+for r in range(1,515):
     try:
         f_voc = open("data/voc/restaurant_%s_voc.txt"%r)
     except:
@@ -70,7 +70,7 @@ for r in range(1,524):
 
 dict_list = []
 rest_cnt = 1
-for rest_num in range(1,524):
+for rest_num in range(1,515):
     try:
         rest_rank = json.load( open("data/rank/restaurant_%s_rank_type3.json"%rest_num))
     except:
@@ -92,22 +92,23 @@ for rest_num in range(1,524):
     for i in range(1,6):
         for dish in rest_rank["rank"]:
             if dish["rank_by_frq"] == i:
+                #for key in dish:
+                #    print key, dish[key]
+                #sys.exit('stop96')
                 dish_name = ""
+                dish_count = 0
                 for d in rest_dict["menu"]:
                     if dish["dish"] == d["name_ar"]:
                         dish_name = d["name"]
+                        dish_count = d['count']
                         break
                 dic = OrderedDict()
                 dic["index"] = i
                 dic["name"] = dish_name
                 dic["name_ar"] = dish["dish"]
-                dic["count"] = dish["dish_cnt"]
-                dic["cosine_avg_score"] = dish["sum_higher0_cos"]
-                dic["cosine_max_score"] = dish["max_cos_10"][0]
-                dic["cosine_nearest"] = NoIndent([{"word":word,"cosine_similarity":cos} for cos, word in zip(dish["max_cos_10"],dish["max_words"])])
-                dic["euclidean_avg_score"] = dish["sum_higher0_cos"]
-                dic["euclidean_min_score"] = dish["max_cos_10"][0]
-                dic["euclidean_nearest"] = NoIndent([{"word":word,"cosine_similarity":cos} for cos, word in zip(dish["max_cos_10"],dish["max_words"])])
+                dic["count"] = dish_count
+                dic["rank_by_frq"] = dish["rank_by_frq"]
+                dic["rank_by_sum_higher0_cosXfrq"] = dish["rank_by_sum_higher0_cosXfrq"]
                 for w in rest_2dim:
                     if w["word"] == dish["dish"]:
                         dic["x"] = w["vector2"][0]
@@ -119,7 +120,7 @@ for rest_num in range(1,524):
     cos_list = []
     for i in range(1,6):
         for dish in rest_rank["rank"]:
-            if dish["rank_by_sum_higher_cos"]["0"] == i:
+            if dish["rank_by_sum_higher0_cosXfrq"] == i:
                 dish_name = ""
                 for d in rest_dict["menu"]:
                     if dish["dish"] == d["name_ar"]:
@@ -130,12 +131,8 @@ for rest_num in range(1,524):
                 dic["name"] = dish_name
                 dic["name_ar"] = dish["dish"]
                 dic["count"] = dish["dish_cnt"]
-                dic["cosine_avg_score"] = dish["sum_higher0_cos"]
-                dic["cosine_max_score"] = dish["max_cos_10"][0]
-                dic["cosine_nearest"] = NoIndent( [{"word":word,"cosine_similarity":cos} for cos, word in zip(dish["max_cos_10"],dish["max_words"])])
-                dic["euclidean_avg_score"] = dish["sum_higher0_cos"]
-                dic["euclidean_min_score"] = dish["max_cos_10"][0]
-                dic["euclidean_nearest"] = NoIndent( [{"word":word,"cosine_similarity":cos} for cos, word in zip(dish["max_cos_10"],dish["max_words"])])
+                dic["rank_by_frq"] = dish["rank_by_frq"]
+                dic["rank_by_sum_higher0_cosXfrq"] = dish["rank_by_sum_higher0_cosXfrq"]
                 for w in rest_2dim:
                     if w["word"] == dish["dish"]:
                         dic["x"] = w["vector2"][0]
@@ -144,45 +141,14 @@ for rest_num in range(1,524):
                 cos_list.append(dic)
                 break
 
-    cos_max_list = []
-    for i in range(1,6):
-        for dish in rest_rank["rank"]:
-            if dish["rank_by_max"] == i:
-                dish_name = ""
-                for d in rest_dict["menu"]:
-                    if dish["dish"] == d["name_ar"]:
-                        dish_name = d["name"]
-                        break
-                dic = OrderedDict()
-                dic["index"] = i
-                dic["name"] = dish_name
-                dic["name_ar"] = dish["dish"]
-                dic["count"] = dish["dish_cnt"]
-                dic["cosine_avg_score"] = dish["sum_higher0_cos"]
-                dic["cosine_max_score"] = dish["max_cos_10"][0]
-                dic["cosine_nearest"] = NoIndent( [{"word":word,"cosine_similarity":cos} for cos, word in zip(dish["max_cos_10"],dish["max_words"])])
-                dic["euclidean_avg_score"] = dish["sum_higher0_cos"]
-                dic["euclidean_min_score"] = dish["max_cos_10"][0]
-                dic["euclidean_nearest"] = NoIndent( [{"word":word,"cosine_similarity":cos} for cos, word in zip(dish["max_cos_10"],dish["max_words"])])
-                for w in rest_2dim:
-                    if w["word"] == dish["dish"]:
-                        dic["x"] = w["vector2"][0]
-                        dic["y"] = w["vector2"][1]
-                        break
-                cos_max_list.append(dic)
-                break
 
     rest_dic = OrderedDict()
     rest_dic["index"] = rest_cnt
     rest_dic["restaurant_name"] = rest_dict["restaurant_name"]
     rest_dic["restaurant_id"] = rest_dict["restaurant_id"]
-    rest_dic["stars"] = rest_dict["stars"]
     rest_dic["review_count"] = rest_dict["review_count"]
     rest_dic["top5_frequent"] = frq_list
     rest_dic["top5_cosine_avg"] = cos_list
-    rest_dic["top5_cosine_max"] = cos_max_list
-    rest_dic["top5_euclidean_avg"] = cos_list
-    rest_dic["top5_euclidean_min"] = cos_max_list
     dict_list.append(rest_dic)
     rest_cnt+=1
 
