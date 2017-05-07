@@ -84,7 +84,7 @@ class new_ReviewParser:
             print '(1) Cleaning reviews...'
         cleaned_reviews = []
         length = len(self.raw_reviews)
-        testing_reviews = []
+        comparing_reviews = []
         for review in self.raw_reviews:
             review = review.lower().strip()
             review = re.sub(r'https?:\/\/.*[\r\n]*', ' ', review, flags=re.MULTILINE)
@@ -93,23 +93,11 @@ class new_ReviewParser:
             review = review.replace('\n',' ')
             #remove accents
             review = unicodedata.normalize('NFKD', review).encode('ASCII', 'ignore')
+            comparing_reviews.append(review)
 
-            testing_reviews.append(review)
-            if self.testing == True:
-                cnt += 1
-                sys.stdout.write('\rStatus: %s / %s'%(cnt, length))
-                sys.stdout.flush()
-
-        for review in self.raw_reviews:
-            review = review.lower().strip()
-            review = re.sub(r'https?:\/\/.*[\r\n]*', ' ', review, flags=re.MULTILINE)
-            review = review.replace('\'m',' am').replace('\'re',' are').replace('\'s',' is').replace('\'ve',' have')
-            review = review.replace('\'d',' would').replace('n\'t', ' not').replace('\'ll',' will')
             review = re.sub('([^\w])+',' ',review)
-            #remove accents
-            review = unicodedata.normalize('NFKD', review).encode('ASCII', 'ignore')
-
             cleaned_reviews.append(review)
+
             if self.testing == True:
                 cnt += 1
                 sys.stdout.write('\rStatus: %s / %s'%(cnt, length))
@@ -191,9 +179,9 @@ class new_ReviewParser:
             print "\nrestaurant_%s.txt backend review rendered."%self.rest_num
 
         #(7)Rendering compare file
-        f = open('data/compare/restaurant_%s.txt'%self.rest_num,'w+')
+        f = open('data/compare/restaurant_%s.json'%self.rest_num,'w+')
         lst = []
-        for test, stem in zip(testing_reviews, stemmed_reviews):
+        for test, stem in zip(comparing_reviews, stemmed_reviews):
             dic = {}
             dic['old'] = test
             dic['new'] = stem
