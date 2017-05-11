@@ -13,9 +13,11 @@ class DishScore:
 
         """sys.argv[0] ../data/line-data/vectors/200dim/restaurant_1_vector200.txt"""
         """sys.argv[0] data/vectors/200dim/restaurant_1_vector200.txt"""
-        self.vec64_src = sys.argv[1]
-        self.rest_num = int(re.search("_([0-9]+)_", sys.argv[1].split("/")[3]).group(1))
-        self.build_type = int(re.search("type([0-9]+)", sys.argv[1].split("/")[3]).group(1))
+        self.rest_num = sys.argv[1]
+        self.vec64_src = 'data/vectors/norm_64dim/norm_restaurant_%s_vector64_type3.txt'%self.rest_num
+        #self.rest_num = int(re.search("_([0-9]+)_", sys.argv[1].split("/")[3]).group(1))
+        #self.build_type = int(re.search("type([0-9]+)", sys.argv[1].split("/")[3]).group(1))
+        self.build_type = 3
         #self.rest_dic_list_src ="data/restaurant_dict_list/restaurant_dict_list.json"
         self.rest_dic_src = "data/restaurant_dict_list/restaurant_dict_%s.json"%self.rest_num
         self.rest_dic = {}
