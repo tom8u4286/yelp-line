@@ -10,7 +10,7 @@ class new_ReviewParser:
     1. backend_reviews  2. frontend_reviews   3. restaurant_dict_*.json
     """
     def __init__(self):
-        self.testing = True
+        self.testing = False
         if self.testing == True:
             print "Start processing file restaurant_%s.json..."%(sys.argv[1])
 
@@ -269,6 +269,7 @@ class new_ReviewParser:
                 review = review.split(' ')
                 senti_indices = [idx for idx, word in enumerate(review) if '_senti' in word]
                 dish_indices = [idx for idx, word in enumerate(review) if self.append_rest_name in word]
+
                 length_lst = []
                 for idx_d in dish_indices:
                     length_lst.append(min([abs(idx_d-idx_s) for idx_s in senti_indices]))
@@ -332,7 +333,39 @@ class new_ReviewParser:
 
         if self.testing == True:
             print "\nrestaurant_dict_%s.json restaurant_dict rendered."%self.rest_num
+
+    def render_senti_statistics(self):
+        if self.testing == True:
             print "------------------------------------"
+            print "Start rendering sentiment statistics..."
+        lexicon = []
+        for senti in self.lexicon:
+            lexicon.append(senti.replace(' ','-'))
+
+        senti_cnt = 1
+        senti_list = []
+        for senti in lexicon:
+            review_cnt = 1
+            senti_frq = 0
+            for review in self.backend_reviews:
+                senti_frq += review.count(senti)
+
+                if self.testing == True:
+                    sys.stdout.write('\rStatus: %s / %s'%(senti_cnt, len(lexicon)))
+                    sys.stdout.flush()
+                    review_cnt+=1
+
+            orderedDict = OrderedDict()
+            orderedDict['index'] = senti_cnt
+            orderedDict['word'] = senti
+            orderedDict['count'] = senti_frq
+            senti_list.append(NoIndent(orderedDict))
+            senti_cnt += 1
+        f = open('data/sentiment_statistics/restaurant_%s.json'%self.rest_num, 'w+')
+        f.write(json.dumps(senti_list, indent = 4, cls=NoIndentEncoder))
+        f.close()
+
+        print 'senti statistic file is rendered.'
 
 class NoIndent(object):
     def __init__(self, value):
@@ -361,5 +394,6 @@ if __name__ == '__main__':
     parser.render_backend_reviews()
     parser.render_frontend_reviews()
     parser.render_restaurant_dict()
+    parser.render_senti_statistics()
     print 'Done. restaurant_%s processed.'%sys.argv[1]
 
