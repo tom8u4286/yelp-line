@@ -2,12 +2,14 @@ import json
 import random
 import numpy as np
 import sys
+import re
+import unicodedata
 from operator import itemgetter
 
 #Dish Extraction
 f_dict = open('data/restaurant_dict_list/restaurant_dict_1.json')
 rest_dict = json.load(f_dict)
-menu = [dish for dish in rest_dict['menu'] if dish['count'] >= 10]
+menu = [dish for dish in rest_dict['menu'] if dish['mentioned_review_num'] >= 10]
 
 menu_length = len(menu)
 num1, num2 = int(menu_length*0.27), int(menu_length*0.74)
@@ -22,32 +24,40 @@ for num in random.sample(range(num1, num2), 4):
 for num in random.sample(range(num2, menu_length), 3):
     dish_list.append(menu[num])
 
-#top3 = [menu[num] for num in random.sample(range(0, num1+1), 3)]
-#mid3 =  [menu[num] for num in random.sample(range(num1, num2+1), 4)]
-#bot3 =  [menu[num] for num in random.sample(range(num2, menu_length+1), 3)]
-for dish in dish_list:
-    print dish
 
-f_review = open('data/compare/restaurant_1.json')
-review_dic = json.load(f_review)
-new_review_dic_list = []
-for review in review_dic:
-    length = len(review['new'].split(' '))
-    review['len'] = length
-    new_review_dic_list.append(review)
+#f_review = open('data/compare/restaurant_1.json')
+#review_dic = json.load(f_review)
+#new_review_dic_list = []
+#for review in review_dic:
+#    length = len(review['new'].split(' '))
+#    review['len'] = length
+#    new_review_dic_list.append(review)
+#
+#sorted_review_list = sorted(new_review_dic_list, key=itemgetter('len'))
+#raw_reviews = [review['old'].replace('\n','') for review in sorted_review_list]
+#backend_reviews = [review['new'] for review in sorted_review_list]
 
-sorted_review_list = sorted(new_review_dic_list, key=itemgetter('len'))
-raw_reviews = [review['old'].replace('\n','') for review in sorted_review_list]
-backend_reviews = [review['new'] for review in sorted_review_list]
-
+f_review = open('data/frontend_reviews/restaurant_1.json')
+dic = json.load(f_review)
+dishes_reviews = dic['dish_reviews']
 
 for dish in dish_list:
+    dish_name = dish['name']
     dish_ar = dish['name_ar']
     dish_reviews = []
+    for d in dishes_reviews:
+        if d['dish_name'] == dish_name:
+            dish_reviews = d['reviews']
+    dish_reviews = [review.replace('\n','') for review in dish_reviews]
+    dish_reviews = sorted(dish_reviews, key=len)
+    dish_reviews = [unicodedata.normalize('NFKD', review).encode('ASCII', 'ignore') for review in dish_reviews]
+    dish_reviews = [review.replace('<mark>','@@@@@').replace('</mark>','@@@@@') for review in dish_reviews]
 
-    for review in sorted_review_list:
-        if dish_ar in review['new']:
-            dish_reviews.append(review)
+    #for review in sorted_review_list:
+    #    if dish_ar in review['new']:
+    #        review['old'] = review['old'].replace('.',' . ').replace(',',' , ').replace('!',' ! ').replace('?',' ? ')
+    #        review['old'] = re.sub(dish['regex'],'<<<<<'+dish['name']+'>>>>>',review['old'])
+    #        dish_reviews.append(review)
     select_list = []
     if len(dish_reviews) > 10:
         percent02 = int(len(dish_reviews)*0.2)
@@ -70,8 +80,7 @@ for dish in dish_list:
 
     extract_reviews = []
     for num in select_list:
-        extract_reviews.append(dish_reviews[num]['old'])
-    f_out = open('../TestingReviews/%s.txt'%dish_ar,'w+')
+        extract_reviews.append(dish_reviews[num])
+    f_out = open('data/QuestionReviews/%s.txt'%dish_ar,'w+')
     f_out.write('\n'.join(extract_reviews))
-
 

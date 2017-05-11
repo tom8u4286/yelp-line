@@ -57,11 +57,12 @@ class new_ReviewParser:
                 dishes_regex.append(regex)
             elif len(token_list) > 1:
                 for i in xrange(len(token_list)-1):
-                    token_list[i] += '\\s*'
+                    token_list[i] += '\s*'
                 for i in xrange(len(token_list)-2):
                     token_list[i] += '|'
                 regex = '\s(' + ''.join(token_list[:-1]) + ')+' + token_list[-1:][0][:-1] + '[a-z]+(s|es|ies)?\s'
                 dishes_regex.append(regex)
+
 
         #get dishes_ar
         append_rest_name = re.sub('([^\w])+',' ', self.rest_name.strip('\'s')).lower().replace(' ', '-')
@@ -83,8 +84,8 @@ class new_ReviewParser:
             print "Start processing backend review...."
             print '(1) Cleaning reviews...'
         cleaned_reviews = []
-        length = len(self.raw_reviews)
         comparing_reviews = []
+        length = len(self.raw_reviews)
         for review in self.raw_reviews:
             review = review.lower().strip()
             review = re.sub(r'https?:\/\/.*[\r\n]*', ' ', review, flags=re.MULTILINE)
@@ -93,8 +94,10 @@ class new_ReviewParser:
             review = review.replace('\n',' ')
             #remove accents
             review = unicodedata.normalize('NFKD', review).encode('ASCII', 'ignore')
+            #comparing reviews contains punctuations
             comparing_reviews.append(review)
 
+            #cleaned_reviews doesn't contains punctuations
             review = re.sub('([^\w])+',' ',review)
             cleaned_reviews.append(review)
 
@@ -178,18 +181,17 @@ class new_ReviewParser:
         if self.testing == True:
             print "\nrestaurant_%s.txt backend review rendered."%self.rest_num
 
+
         #(7)Rendering compare file
         f = open('data/compare/restaurant_%s.json'%self.rest_num,'w+')
         lst = []
-        for test, stem in zip(comparing_reviews, stemmed_reviews):
+        for origin, back in zip(comparing_reviews, self.backend_reviews):
             dic = {}
-            dic['old'] = test
-            dic['new'] = stem
+            dic['origin'] = origin
+            dic['backend_review'] = back
             lst.append(dic)
         f.write(json.dumps(lst, indent = 4))
 
-        self.backend_reviews = stemmed_reviews
-        self.backend_reivews_processed = True
         if self.testing == True:
             print "\nrestaurant_%s.txt comparing review (before and after preprocessed) rendered."%self.rest_num
 
@@ -206,9 +208,13 @@ class new_ReviewParser:
             dish_review_list = []
             review_cnt = 1
             for review in self.raw_reviews:
-                review = review.strip('and').strip('&')
-                new_review = re.sub(dish_regex,' <mark>'+raw_dish+'</mark> ', review)
-                if review != new_review:
+                review = review.replace(' and ',' ').replace(' & ',' ').replace('\n',' ')
+                review = review.replace('.',' . ').replace(',',' , ').replace('!',' ! ').replace('?',' ? ')
+                review_lower = review.lower()
+                new_review = re.sub(dish_regex,' <mark>'+raw_dish+'</mark> ', review_lower)
+
+                if review_lower != new_review:
+                    new_review = re.sub('\s+',' ',new_review)
                     dish_review_list.append(new_review)
                 if self.testing == True:
                     review_cnt +=1
@@ -233,6 +239,7 @@ class new_ReviewParser:
 
         if self.testing == True:
             print "\nrestaurant_%s.json frontend review rendered."%self.rest_num
+
 
     def render_restaurant_dict(self):
         if self.testing == True:
@@ -279,15 +286,19 @@ class new_ReviewParser:
         dish_cnt = 1
         for raw_dish, dish_ar, dish_regex in zip(self.raw_dishes, self.dishes_ar, self.dishes_regex):
             dish_total = 0
+            mentioned_review_num = 0
             review_cnt = 1
             for review in self.backend_reviews:
                 dish_total += review.count(dish_ar)
+                if dish_ar in review:
+                    mentioned_review_num += 1
                 if self.testing == True:
                     sys.stdout.write('\rDishes: %s / %s Reviews: %s / %s  '%(dish_cnt, menu_length, review_cnt, review_length))
                     sys.stdout.flush()
                     review_cnt += 1
             dic = {}
             dic['count'] = dish_total
+            dic['mentioned_review_num'] = mentioned_review_num
             dic['name'] = raw_dish
             dic['name_ar'] = dish_ar
             dic['regex'] = dish_regex
@@ -299,6 +310,7 @@ class new_ReviewParser:
             dic = OrderedDict()
             dic['index'] = idx +1
             dic['count'] = dish['count']
+            dic['mentioned_review_num'] = dish['mentioned_review_num']
             dic['name'] = dish['name']
             dic['name_ar'] = dish['name_ar']
             dic['regex'] = dish['regex']
