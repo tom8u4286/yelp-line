@@ -7,10 +7,13 @@ from operator import itemgetter
 
 class new_ReviewParser:
     """This program aims to transform raw_review restaurant_*.json into
-    1. backend_reviews  2. frontend_reviews   3. restaurant_dict_*.json
+    1. backend_reviews
+    2. frontend_reviews
+    3. restaurant_dict_*.json
+    4. sentiment_statistic
     """
     def __init__(self):
-        self.testing = False
+        self.testing = True
         if self.testing == True:
             print "Start processing file restaurant_%s.json..."%(sys.argv[1])
 
@@ -63,16 +66,10 @@ class new_ReviewParser:
                 regex = '\s(' + ''.join(token_list[:-1]) + ')+' + token_list[-1:][0][:-1] + '[a-z]+(s|es|ies)?\s'
                 dishes_regex.append(regex)
 
-
         #get dishes_ar
         append_rest_name = re.sub('([^\w])+',' ', self.rest_name.strip('\'s')).lower().replace(' ', '-')
         dishes_ar = [ dish.replace(' ','-') + '_' + append_rest_name  for dish in cleaned_menu]
-        #f = open('test.txt','w+')
-        #lst = []
-        #for raw, reg, ar in zip(raw_dishes, dishes_regex, dishes_ar):
-        #    lst.append( raw + ' ' + reg + ' ' + ar)
-        #f.write('\n'.join(lst))
-        #sys.exit('72stop')
+
         return raw_dishes, dishes_regex, dishes_ar, append_rest_name
 
     def render_backend_reviews(self):
@@ -202,28 +199,35 @@ class new_ReviewParser:
             print "Start rendering frontend review..."
             print 'Marking dishes <mark>...'
         dish_cnt = 1
-        dishes_reviews = []
         menu_length, review_length = len(self.raw_dishes), len(self.raw_reviews)
-        for dish_regex, raw_dish in zip(self.dishes_regex, self.raw_dishes):
-            dish_review_list = []
-            review_cnt = 1
-            for review in self.raw_reviews:
-                review = review.replace(' and ',' ').replace(' & ',' ').replace('\n',' ')
-                review = review.replace('.',' . ').replace(',',' , ').replace('!',' ! ').replace('?',' ? ')
-                review_lower = review.lower()
-                new_review = re.sub(dish_regex,' <mark>'+raw_dish+'</mark> ', review_lower)
 
-                if review_lower != new_review:
-                    new_review = re.sub('\s+',' ',new_review)
-                    dish_review_list.append(new_review)
+        markedReviewList = []
+        review_cnt = 1
+        for review in self.raw_reviews:
+            review = review.lower()
+            review = review.replace(' and ',' ').replace(' & ',' ').replace('\n',' ')
+            review = review.replace('.',' . ').replace(',',' , ').replace('!',' ! ').replace('?',' ? ')
+            review = review.replace('(',' ( ').replace(')',' ) ')
+
+            dish_cnt =1
+            for dish_regex, raw_dish in zip(self.dishes_regex, self.raw_dishes):
+                review = re.sub(dish_regex,' <mark>'+raw_dish+'</mark> ', review)
                 if self.testing == True:
-                    review_cnt +=1
-                    sys.stdout.write('\rDishes: %s / %s Reviews: %s / %s  '%(dish_cnt, menu_length, review_cnt, review_length))
+                    sys.stdout.write('\rReviews: %s / %s  Dishes: %s / %s '%(review_cnt, review_length,dish_cnt, menu_length ))
                     sys.stdout.flush()
+                    dish_cnt +=1
+            review = re.sub('\s+',' ',review)
+            markedReviewList.append(review)
+            review_cnt +=1
+
+        dishes_reviews = []
+        dish_cnt = 1
+        for raw_dish in self.raw_dishes:
+            dish_reviews_list = [review for review in markedReviewList if raw_dish in review]
             dic = OrderedDict()
             dic['dish_index'] = dish_cnt
             dic['dish_name'] = raw_dish
-            dic['reviews'] = dish_review_list
+            dic['reviews'] = dish_reviews_list
             dishes_reviews.append(dic)
             dish_cnt += 1
 
@@ -365,7 +369,8 @@ class new_ReviewParser:
         f.write(json.dumps(senti_list, indent = 4, cls=NoIndentEncoder))
         f.close()
 
-        print 'senti statistic file is rendered.'
+        if self.testing == True:
+            print 'senti statistic file is rendered.'
 
 class NoIndent(object):
     def __init__(self, value):
