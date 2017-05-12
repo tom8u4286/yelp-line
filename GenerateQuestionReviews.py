@@ -10,6 +10,12 @@ from operator import itemgetter
 f_dict = open('data/restaurant_dict_list/restaurant_dict_1.json')
 rest_dict = json.load(f_dict)
 menu = [dish for dish in rest_dict['menu'] if dish['mentioned_review_num'] >= 10]
+new_menu = []
+for dish in menu:
+    dish['length'] = len(dish['name'])
+    new_menu.append(dish)
+new_menu = sorted(new_menu, key=itemgetter('length'), reverse=True)
+menu = new_menu
 
 menu_length = len(menu)
 num1, num2 = int(menu_length*0.27), int(menu_length*0.74)
@@ -23,19 +29,6 @@ for num in random.sample(range(num1, num2), 4):
 
 for num in random.sample(range(num2, menu_length), 3):
     dish_list.append(menu[num])
-
-
-#f_review = open('data/compare/restaurant_1.json')
-#review_dic = json.load(f_review)
-#new_review_dic_list = []
-#for review in review_dic:
-#    length = len(review['new'].split(' '))
-#    review['len'] = length
-#    new_review_dic_list.append(review)
-#
-#sorted_review_list = sorted(new_review_dic_list, key=itemgetter('len'))
-#raw_reviews = [review['old'].replace('\n','') for review in sorted_review_list]
-#backend_reviews = [review['new'] for review in sorted_review_list]
 
 f_review = open('data/frontend_reviews/restaurant_1.json')
 dic = json.load(f_review)
@@ -53,11 +46,6 @@ for dish in dish_list:
     dish_reviews = [unicodedata.normalize('NFKD', review).encode('ASCII', 'ignore') for review in dish_reviews]
     dish_reviews = [review.replace('<mark>','@@@@@').replace('</mark>','@@@@@') for review in dish_reviews]
 
-    #for review in sorted_review_list:
-    #    if dish_ar in review['new']:
-    #        review['old'] = review['old'].replace('.',' . ').replace(',',' , ').replace('!',' ! ').replace('?',' ? ')
-    #        review['old'] = re.sub(dish['regex'],'<<<<<'+dish['name']+'>>>>>',review['old'])
-    #        dish_reviews.append(review)
     select_list = []
     if len(dish_reviews) > 10:
         percent02 = int(len(dish_reviews)*0.2)
