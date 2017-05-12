@@ -52,7 +52,7 @@ class DishScore:
         return senti_indices, dish_indices
 
     def get_senti_dic_list(self):
-        f = open("data/frontend_sentiment/frontend_sentiment_rest%s.json"%self.rest_num)
+        f = open("data/sentiment_statistics/restaurant_%s.json"%self.rest_num)
         senti_dic = json.load(f)
         return senti_dic
 
