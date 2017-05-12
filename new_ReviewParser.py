@@ -13,7 +13,7 @@ class new_ReviewParser:
     4. sentiment_statistic
     """
     def __init__(self):
-        self.testing = True
+        self.testing = False
         if self.testing == True:
             print "Start processing file restaurant_%s.json..."%(sys.argv[1])
 
@@ -223,7 +223,7 @@ class new_ReviewParser:
         dishes_reviews = []
         dish_cnt = 1
         for raw_dish in self.raw_dishes:
-            dish_reviews_list = [review for review in markedReviewList if raw_dish in review]
+            dish_reviews_list = [review for review in markedReviewList if '<mark>'+raw_dish+'<mark>' in review]
             dic = OrderedDict()
             dic['dish_index'] = dish_cnt
             dic['dish_name'] = raw_dish
