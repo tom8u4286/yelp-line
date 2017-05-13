@@ -25,7 +25,7 @@ class new_ReviewParser:
         self.backend_reivews_processed = False
 
     def get_rest_info(self):
-        f = open("data/reviews/restaurant_%s.json"%self.rest_num)
+        f = open("data/reviews/restaurant_%s_raw.json"%self.rest_num)
         dic = json.load(f)
         return dic["business_name"], dic["business_id"], dic["reviews"]
 

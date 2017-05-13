@@ -46,7 +46,7 @@ class ReviewClassifier:
         fi = open("data/new_business_list.json","r")
         business_list_file = json.load(fi)
         for business in business_list:
-            f = open("data/reviews/restaurant_%s.json"%(cnt+1), "w+")
+            f = open("data/reviews/restaurant_%s_raw.json"%(cnt+1), "w+")
             cnt += 1
             text_list = []
             print "Status:", cnt, "/", length, " | Sorting reviews in that match business_id:", business["business_id"], "into:",  business["business_name"]
