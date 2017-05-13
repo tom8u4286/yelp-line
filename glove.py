@@ -47,7 +47,7 @@ def parse_args():
                                  'loaded from the file. If it does not '
                                  'exist, the matrix will be written to '
                                  'this file.'))
-    g_cooccur.add_argument('-w', '--window-size', type=int, default=4,
+    g_cooccur.add_argument('-w', '--window-size', type=int, default=3,
                            help=('Number of context words to track to '
                                  'left and right of each word'))
     g_cooccur.add_argument('--min-count', type=int, default=5,
@@ -433,14 +433,14 @@ def main(arguments):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG,
                         format="%(asctime)s\t%(message)s")
-    build_type = 1
-    main(parse_args())
-    build_type = 2
-    main(parse_args())
+    #build_type = 1
+    #main(parse_args())
+    #build_type = 2
+    #main(parse_args())
     build_type = 3
     main(parse_args())
-    build_type = 4
-    main(parse_args())
+    #build_type = 4
+    #main(parse_args())
 
 
 
