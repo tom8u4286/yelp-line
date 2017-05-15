@@ -32,7 +32,7 @@ lexicon_list = json.load(f_lexicon)
 lexicon_list = ["-".join(line.split(" ")[:-1])+"_senti" for line in lexicon_list]
 
 #Rendering the frontend_sentiment_statistics.json
-for r in range(1,515):
+for r in range(1,257):
     try:
         f_voc = open("data/voc/restaurant_%s_voc.txt"%r)
     except:
@@ -44,6 +44,10 @@ for r in range(1,515):
         first = int(w[0])
         tmp.append([int(w[0]),w[1].strip("\n")])
     voc_list = tmp
+    if r == 141:
+        f_output = open("data/frontend_sentiment/frontend_sentiment_rest%s.json"%r,"w+")
+        f_output.write(json.dumps([], indent=4))
+        continue
 
     f_dim2 = open("data/vectors/2dim/restaurant_%s_vector2_type3.json"%r)
     dim2_list = json.load(f_dim2)
@@ -66,35 +70,39 @@ for r in range(1,515):
     f_output = open("data/frontend_sentiment/frontend_sentiment_rest%s.json"%r,"w+")
     f_output.write(json.dumps(word_list, indent=4, cls=NoIndentEncoder))
 
-#Rendering the frontend_restaurant_dict_list.json
 
+#Rendering the frontend_restaurant_dict_list.json
 dict_list = []
 rest_cnt = 1
-for rest_num in range(1,515):
+for rest_num in range(1,257):
+
     try:
         rest_rank = json.load( open("data/rank/restaurant_%s_rank_type3.json"%rest_num))
     except:
         print "cannot open file /rank/restaurant_%s_rank_type3.json"%rest_num
-        rest_cnt+=1
     try:
         rest_dict = json.load( open("data/restaurant_dict_list/restaurant_dict_%s.json"%rest_num))
     except:
         print "cannot open file /restaurant_dict_list/restaurant_dict_%s.json"%rest_num
-        rest_cnt+=1
     try:
         rest_2dim = json.load( open("data/vectors/2dim/restaurant_%s_vector2_type3.json"%rest_num))
     except:
         print "cannot open file /vectors/2dim/restaurant_%s_vector2_type3.json"%rest_num
-        rest_cnt+=1
+    if rest_num == 141:
+        rest_dic = OrderedDict()
+        rest_dic["index"] = rest_num
+        rest_dic["restaurant_name"] = rest_dict["restaurant_name"]
+        rest_dic["restaurant_id"] = rest_dict["restaurant_id"]
+        rest_dic["review_count"] = rest_dict["review_count"]
+        rest_dic["top5_frequent"] = []
+        rest_dic["top5_cosine_avg"] = []
+        dict_list.append(rest_dic)
         continue
 
     frq_list = []
     for i in range(1,6):
         for dish in rest_rank["rank"]:
             if dish["rank_by_frq"] == i:
-                #for key in dish:
-                #    print key, dish[key]
-                #sys.exit('stop96')
                 dish_name = ""
                 dish_count = 0
                 for d in rest_dict["menu"]:
@@ -141,16 +149,14 @@ for rest_num in range(1,515):
                 cos_list.append(dic)
                 break
 
-
     rest_dic = OrderedDict()
-    rest_dic["index"] = rest_cnt
+    rest_dic["index"] = rest_num
     rest_dic["restaurant_name"] = rest_dict["restaurant_name"]
     rest_dic["restaurant_id"] = rest_dict["restaurant_id"]
     rest_dic["review_count"] = rest_dict["review_count"]
     rest_dic["top5_frequent"] = frq_list
     rest_dic["top5_cosine_avg"] = cos_list
     dict_list.append(rest_dic)
-    rest_cnt+=1
 
 f_dict_list = open("data/frontend_restaurant_dict_list.json","w+")
 f_dict_list.write(json.dumps(dict_list, indent=4, cls=NoIndentEncoder))
