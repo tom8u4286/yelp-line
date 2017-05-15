@@ -2,6 +2,8 @@ import sys
 import numpy as np
 import json
 import re
+import uuid
+from collections import OrderedDict
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 
@@ -58,7 +60,7 @@ class Tsne:
         filename = sys.argv[1].split("/")
         num = re.search("([0-9]+).+(type[0-9])", filename[3])
         f = open("data/vectors/2dim/restaurant_%s_vector2_%s.json"%(num.group(1),num.group(2)), "w+")
-        json.dump(self.dim2, f, indent = 4, cls=NoIndentEncoder)
+        f.write(json.dumps(self.dim2, indent = 4, cls=NoIndentEncoder))
         f.close()
 
 class NoIndent(object):
