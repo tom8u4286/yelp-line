@@ -24,9 +24,10 @@ for num in range(1,257):
     f_senti = 'data/sentiment_statistics/restaurant_%s.json'%num
     f_64dim = 'data/vectors/64dim/restaurant_%s_vector64_type3.txt'%num
     f_n64dim = 'data/vectors/norm_64dim/norm_restaurant_%s_vector64_type3.txt'%num
+    f_2dim = 'data/vectors/2dim/restaurant_%s_vector2_type3.json'%num
     f_voc = 'data/voc/restaurant_%s_voc.txt'%num
 
-    checkList = [f_back, f_compare, f_coo, f_front, f_dict, f_rank, f_senti, f_64dim, f_n64dim, f_voc]
+    checkList = [f_back, f_compare, f_coo, f_front, f_dict, f_rank, f_senti, f_64dim, f_n64dim, f_2dim, f_voc]
 
     for f in checkList:
         if not os.path.isfile(f):
