@@ -223,7 +223,7 @@ class new_ReviewParser:
         dishes_reviews = []
         dish_cnt = 1
         for raw_dish in self.raw_dishes:
-            dish_reviews_list = [review for review in markedReviewList if '<mark>'+raw_dish+'<mark>' in review]
+            dish_reviews_list = [review for review in markedReviewList if '<mark>'+raw_dish+'</mark>' in review]
             dic = OrderedDict()
             dic['dish_index'] = dish_cnt
             dic['dish_name'] = raw_dish
@@ -396,9 +396,9 @@ class NoIndentEncoder(json.JSONEncoder):
 
 if __name__ == '__main__':
     parser = new_ReviewParser()
-    parser.render_backend_reviews()
+    #parser.render_backend_reviews()
     parser.render_frontend_reviews()
-    parser.render_restaurant_dict()
-    parser.render_senti_statistics()
+    #parser.render_restaurant_dict()
+    #parser.render_senti_statistics()
     print 'Done. restaurant_%s processed.'%sys.argv[1]
 
