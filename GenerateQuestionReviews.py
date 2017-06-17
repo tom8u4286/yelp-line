@@ -6,8 +6,10 @@ import re
 import unicodedata
 from operator import itemgetter
 
+rest_num = sys.argv[1]
+
 #Dish Extraction
-f_dict = open('data/restaurant_dict_list/restaurant_dict_1.json')
+f_dict = open('data/restaurant_dict_list/restaurant_dict_%s.json'%rest_num)
 rest_dict = json.load(f_dict)
 menu = [dish for dish in rest_dict['menu'] if dish['mentioned_review_num'] >= 10]
 new_menu = []
@@ -30,7 +32,7 @@ for num in random.sample(range(num1, num2), 4):
 for num in random.sample(range(num2, menu_length), 3):
     dish_list.append(menu[num])
 
-f_review = open('data/frontend_reviews/restaurant_1.json')
+f_review = open('data/frontend_reviews/restaurant_%s.json'%rest_num)
 dic = json.load(f_review)
 dishes_reviews = dic['dish_reviews']
 
@@ -44,7 +46,8 @@ for dish in dish_list:
     dish_reviews = [review.replace('\n','') for review in dish_reviews]
     dish_reviews = sorted(dish_reviews, key=len)
     dish_reviews = [unicodedata.normalize('NFKD', review).encode('ASCII', 'ignore') for review in dish_reviews]
-    dish_reviews = [review.replace('<mark>','@@@@@').replace('</mark>','@@@@@') for review in dish_reviews]
+    dish_reviews = [review.replace('<mark>'+dish['name']+'</mark>','@@@@@'+dish['name']+'@@@@@') for review in dish_reviews]
+    dish_reviews = [review.replace('<mark>','').replace('</mark>','') for review in dish_reviews]
 
     select_list = []
     if len(dish_reviews) > 10:
@@ -69,6 +72,6 @@ for dish in dish_list:
     extract_reviews = []
     for num in select_list:
         extract_reviews.append(dish_reviews[num])
-    f_out = open('data/QuestionReviews/%s.txt'%dish_ar,'w+')
+    f_out = open('data/QuestionReviews/rest%s/%s.txt'%(rest_num, dish_ar),'w+')
     f_out.write('\n'.join(extract_reviews))
 
