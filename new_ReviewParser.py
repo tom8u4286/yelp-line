@@ -13,7 +13,7 @@ class new_ReviewParser:
     4. sentiment_statistic
     """
     def __init__(self):
-        self.testing = False
+        self.testing = True
         if self.testing == True:
             print "Start processing file restaurant_%s.json..."%(sys.argv[1])
 
@@ -35,7 +35,7 @@ class new_ReviewParser:
         return pos_list
 
     def get_dishes_info(self):
-        dic = json.load(open("data/new_business_list.json"))
+        dic = json.load(open("data/business_list_r7.json"))
         #get raw_dishes
         raw_dishes = []
         for rest in dic:
@@ -47,7 +47,7 @@ class new_ReviewParser:
         #get dishes_regex
         cleaned_menu = []
         for dish in raw_dishes:
-            dish = dish.lower().replace('_',' ').replace(' & ',' and ').replace(' or ', ' ').replace('\'s','')
+            dish = dish.lower().replace('_',' ').replace(' & ',' and ').replace(' or ', ' ').replace('\'s','').replace(' of ',' ')
             re_token = re.compile('[a-z][a-z]+')
             dish = ' '.join(re_token.findall(dish))
             if len(dish) > 2:
@@ -207,7 +207,7 @@ class new_ReviewParser:
             review = review.lower()
             review = review.replace(' and ',' ').replace(' & ',' ').replace('\n',' ')
             review = review.replace('.',' . ').replace(',',' , ').replace('!',' ! ').replace('?',' ? ')
-            review = review.replace('(',' ( ').replace(')',' ) ')
+            review = review.replace(':',' : ').replace('-',' - ').replace('(',' ( ').replace(')',' ) ')
 
             dish_cnt =1
             for dish_regex, raw_dish in zip(self.dishes_regex, self.raw_dishes):
@@ -396,9 +396,9 @@ class NoIndentEncoder(json.JSONEncoder):
 
 if __name__ == '__main__':
     parser = new_ReviewParser()
-    #parser.render_backend_reviews()
+    parser.render_backend_reviews()
     parser.render_frontend_reviews()
-    #parser.render_restaurant_dict()
-    #parser.render_senti_statistics()
+    parser.render_restaurant_dict()
+    parser.render_senti_statistics()
     print 'Done. restaurant_%s processed.'%sys.argv[1]
 
