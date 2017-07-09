@@ -14,7 +14,8 @@ class DishScore:
         """sys.argv[0] ../data/line-data/vectors/200dim/restaurant_1_vector200.txt"""
         """sys.argv[0] data/vectors/200dim/restaurant_1_vector200.txt"""
         self.rest_num = sys.argv[1]
-        self.vec64_src = 'data/vectors/norm_64dim/norm_restaurant_%s_vector64_type3.txt'%self.rest_num
+        self.dim = sys.argv[2]
+        self.vec64_src = 'data/vectors/norm_%sdim/norm_restaurant_%s_vector%s_type3.txt'%(self.dim,self.rest_num,self.dim)
         #self.rest_num = int(re.search("_([0-9]+)_", sys.argv[1].split("/")[3]).group(1))
         #self.build_type = int(re.search("type([0-9]+)", sys.argv[1].split("/")[3]).group(1))
         self.build_type = 3
@@ -354,7 +355,7 @@ class DishScore:
         return p_at5, p_at10, p_at20, p_at30
 
     def render(self, dish_list):
-        f = open("data/rank/restaurant_%s_rank_type%s.json"%(self.rest_num, self.build_type),"w+")
+        f = open("data/rank/%sdim/restaurant_%s_rank_%sdim_type%s.json"%(self.dim,self.rest_num, self.dim, self.build_type),"w+")
         f.write(json.dumps(dish_list ,indent = 4, cls=NoIndentEncoder))
         f.close()
         print "DishScore.py rest_%s_type%s completed"%(self.rest_num, self.build_type)
