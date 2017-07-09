@@ -6,29 +6,49 @@ from operator import itemgetter
 class NDCG:
     def __init__(self):
         self.rest_num = sys.argv[1]
+        self.dim = sys.argv[2]
         self.ground_truth = json.load(open('../data/GroundTruth/rest%s.json'%self.rest_num))
         self.dishes = json.load(open('../data/restaurant_dict_list/restaurant_dict_%s.json'%self.rest_num))['menu']
         self.ground_truth_ar = [d['name_ar'] for dish in self.ground_truth for d in self.dishes if dish[1]==d['name']]
-        self.rank_dish_list = json.load(open('../data/rank/restaurant_%s_rank_type3.json'%self.rest_num))['rank']
+        self.rank_dish_list = json.load(open('../data/rank/%sdim/restaurant_%s_rank_%sdim_type3.json'%(self.dim, self.rest_num, self.dim)))['rank']
+        self.rank_w2v = json.load(open('../../W2V-7-yelp/data/rank/restaurant_%s_rank.json'%self.rest_num))['rank']
         self.i = [4,4,3,3,2,2,1,1,0,0]
-        self.ndcg_frq = self.ndcg_frq()
-        self.ndcg_sum_higher0_cos_zXnorm_frq = self.ndcg_sum_higher0_cos_zXnorm_frq()
-        self.ndcg_sum_higher0_cosXfrq = self.ndcg_sum_higher0_cosXfrq()
-        self.ndcg_sum_total = self.ndcg_sum_total()
-        self.ndcg_coo_senti = self.ndcg_coo_senti()
+        #self.ndcg_frq = self.ndcg_frq()
+        #self.ndcg_sum_higher0_cos_zXnorm_frq = self.ndcg_sum_higher0_cos_zXnorm_frq()
+        #self.ndcg_sum_higher0_cosXfrq = self.ndcg_sum_higher0_cosXfrq()
+        #self.ndcg_sum_total = self.ndcg_sum_total()
+        #self.ndcg_coo_senti = self.ndcg_coo_senti()
         print 'frq:',self.ndcg('rank_by_frq')
-        print 'sum_higher0_cos_zXnorm_frq:',self.ndcg('rank_by_sum_higher0_cos_zXnorm_frq')
+        #print 'sum_higher0_cos_zXnorm_frq:',self.ndcg('rank_by_sum_higher0_cos_zXnorm_frq')
         print 'sum_higher0_cosXfrq:',self.ndcg('rank_by_sum_higher0_cosXfrq')
         print 'sum_total:',self.ndcg('rank_by_sum_total')
         print 'sum_coo:',self.ndcg('sum_senti_coo',re=True)
         print 'avg:',self.ndcg('rank_by_avg')
         print 'max_1:',self.ndcg('rank_by_max_1')
-        print 'max_10:',self.ndcg('rank_by_max_10')
+        print '(W2V)sum_higher0_cosXfrq(W2V):',self.ndcg_w2v('rank_by_sum_higher0_cosXfrq')
+        print '(W2V)avg:',self.ndcg_w2v('rank_by_avg')
+        print '(W2V)sum_total:',self.ndcg_w2v('rank_by_sum_total')
+        #print 'max_10:',self.ndcg('rank_by_max_10')
 
     def ndcg(self, method,re=False):
         method_list = []
         for d in self.ground_truth_ar:
             for dish in self.rank_dish_list:
+                if dish['dish'] == d:
+                    method_list.append([dish[method],dish['dish']])
+        method_list = sorted(method_list, key=itemgetter(0),reverse=re)
+
+        r = []
+        for dish in method_list:
+            for num, d in zip(self.i, self.ground_truth_ar):
+                if dish[1] == d:
+                    r.append(num)
+        return self.ndcg_at_k(r, 10, method=0)
+
+    def ndcg_w2v(self, method,re=False):
+        method_list = []
+        for d in self.ground_truth_ar:
+            for dish in self.rank_w2v:
                 if dish['dish'] == d:
                     method_list.append([dish[method],dish['dish']])
         method_list = sorted(method_list, key=itemgetter(0),reverse=re)
